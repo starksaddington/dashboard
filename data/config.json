@@ -1,0 +1,117 @@
+{
+  "name": "Joseph",
+  "tagline": "Lights out and away we go.",
+  "team": {
+    "name": "Saddington Racing",
+    "motto": "Driving Bitcoin Adoption",
+    "site": "https://saddingtonracing.com/"
+  },
+  "driver": {
+    "name": "Joseph Saddington",
+    "nickname": "TOSHI",
+    "kanji": "利",
+    "number": "81",
+    "carClass": "Pro Spec Miata",
+    "carSpec": "1.8L 4-cyl · 167 hp · 2,450 lb",
+    "series": "Collegiate Racing Series · FARAUSA · SCCA · IMSA",
+    "note": "One of America's youngest pro racers — license at 12.",
+    "site": "https://saddingtonracing.com/"
+  },
+  "seriesOrder": ["imsa", "wec", "nascar", "indycar", "wrc", "supercars"],
+  "favoriteDrivers": [
+    "Joseph Saddington",
+    "Kyle Larson",
+    "Alex Palou",
+    "Sebastien Buemi"
+  ],
+  "favoriteTeams": [
+    "Bitcoin Racing US",
+    "Toyota Gazoo Racing",
+    "Porsche Penske Motorsport",
+    "Hendrick Motorsports"
+  ],
+  "links": [
+    { "label": "Saddington Racing", "url": "https://saddingtonracing.com/" },
+    { "label": "Bitcoin Racing US", "url": "https://bitcoinracing.us/" },
+    { "label": "YouTube", "url": "https://www.youtube.com/@saddingtonracing" },
+    { "label": "Instagram", "url": "https://www.instagram.com/saddingtonracing" },
+    { "label": "TikTok", "url": "https://www.tiktok.com/@saddingtonracing" },
+    { "label": "Motorsport.com", "url": "https://www.motorsport.com/" },
+    { "label": "IMSA", "url": "https://www.imsa.com/" },
+    { "label": "FIA WEC", "url": "https://www.fiawec.com/" },
+    { "label": "NASCAR", "url": "https://www.nascar.com/" },
+    { "label": "IndyCar", "url": "https://www.indycar.com/" },
+    { "label": "WRC", "url": "https://www.wrc.com/" },
+    { "label": "Supercars", "url": "https://www.supercars.com/" }
+  ],
+  "races": [
+    { "name": "Miami 300", "seriesTag": "FARA", "track": "Homestead-Miami Speedway", "date": "2026-01-24" },
+    { "name": "Hoosier Super Tour", "seriesTag": "SCCA", "track": "Road Atlanta", "date": "2026-03-05" },
+    { "name": "Miami Grand Prix", "seriesTag": "FARA", "track": "Homestead-Miami Speedway", "date": "2026-03-07" },
+    { "name": "The Mitty", "seriesTag": "IMSA", "track": "Road Atlanta", "date": "2026-04-24" },
+    { "name": "Memorial 300", "seriesTag": "FARA", "track": "Sebring International Raceway", "date": "2026-05-23" },
+    { "name": "Atlanta 200", "seriesTag": "FARA", "track": "Road Atlanta", "date": "2026-07-31" },
+    { "name": "Homestead 250 / CRS", "seriesTag": "FARA·CRS", "track": "Homestead-Miami Speedway", "date": "2026-10-02" },
+    { "name": "Hankook 300 / CRS P1", "seriesTag": "FARA·CRS", "track": "PI Motor Club", "date": "2026-11-14", "dateLabel": "Nov TBD" },
+    { "name": "FARA Champions / CRS", "seriesTag": "FARA·CRS", "track": "Homestead-Miami Speedway", "date": "2026-12-18" }
+  ],
+  "racesSource": "bitcoinracing.us 2026 schedule",
+  "dailyTasks": {
+    "title": "Joseph's Daily Grid",
+    "subtitle": "Three things every day move the needle: build, pitch, post. Check 'em off.",
+    "tasks": [
+      {
+        "id": "roblox",
+        "icon": "🎮",
+        "title": "Build the Roblox game",
+        "desc": "Ship one improvement today — a new level, a mechanic, or a bug fix. Small progress every day compounds.",
+        "tag": "Create",
+        "links": [
+          { "label": "Roblox Studio", "url": "https://create.roblox.com/" }
+        ]
+      },
+      {
+        "id": "sponsor",
+        "icon": "🤝",
+        "title": "Reach out to a sponsor",
+        "desc": "Send at least one new pitch or follow-up. Aim for one warm intro or one cold ask per day.",
+        "tag": "Grow"
+      },
+      {
+        "id": "content",
+        "icon": "🎥",
+        "title": "Upload racing content",
+        "desc": "Post today's clip or photo from the track. Hit all three channels — keep the streak alive.",
+        "tag": "Post",
+        "links": [
+          { "label": "YouTube", "url": "https://www.youtube.com/@saddingtonracing" },
+          { "label": "Instagram", "url": "https://www.instagram.com/saddingtonracing" },
+          { "label": "TikTok", "url": "https://www.tiktok.com/@saddingtonracing" }
+        ]
+      },
+      {
+        "id": "sim",
+        "icon": "🏎️",
+        "title": "Sim / practice laps",
+        "desc": "30 focused minutes on the rig. Pick one corner or skill and drill it to qualifying pace.",
+        "tag": "Train"
+      },
+      {
+        "id": "fitness",
+        "icon": "💪",
+        "title": "Driver training",
+        "desc": "Neck, core, cardio. Race-fit drivers finish strong in the last stint.",
+        "tag": "Train"
+      },
+      {
+        "id": "engage",
+        "icon": "💬",
+        "title": "Engage with fans",
+        "desc": "Reply to comments and DMs across YouTube, Instagram and TikTok. Community is the long game.",
+        "tag": "Connect"
+      }
+    ],
+    "_notes": "Joseph's recurring daily checklist. Add/edit/remove tasks here. Each task needs a unique 'id' (used to remember checkmarks). Checkboxes save in the browser and reset every morning; clearing all of them in a day extends the 🔥 streak."
+  },
+  "_notes": "Personalized for Joseph 'TOSHI #81' Saddington / Saddington Racing. Edit 'name' for the greeting, 'driver'/'team' for the hero badge, 'seriesOrder' for which championships show, 'dailyTasks' for his to-do list. Reload the page after editing."
+}

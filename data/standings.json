@@ -1,0 +1,92 @@
+{
+  "_notes": "Current championship points per series. NASCAR & IndyCar are overridden LIVE from ESPN at runtime; the values here are only their fallback. WEC, IMSA, WRC and Supercars are a hand-curated snapshot (no public live API) — edit these as the season unfolds. 'points' is the driver's current total. 'roundsDone'/'roundsTotal' drive the Season Progress bars.",
+  "asOf": "2026-05-30",
+  "series": {
+    "imsa": {
+      "label": "IMSA — GTP Drivers",
+      "asOf": "after Laguna Seca (R4)",
+      "roundsDone": 4,
+      "roundsTotal": 11,
+      "color": "#d5001c",
+      "drivers": [
+        { "name": "Laurin Heinrich", "team": "JDC-Miller Porsche #5", "points": 1396 },
+        { "name": "Jack Aitken", "team": "Action Express Cadillac", "points": 1375 },
+        { "name": "Felipe Nasr", "team": "Porsche Penske", "points": 1323 },
+        { "name": "Julien Andlauer", "team": "Porsche Penske", "points": 1323 },
+        { "name": "Kevin Estre", "team": "Porsche Penske", "points": 1250 },
+        { "name": "Laurens Vanthoor", "team": "Porsche Penske", "points": 1250 }
+      ]
+    },
+    "wec": {
+      "label": "FIA WEC — Hypercar",
+      "asOf": "after Spa (R2)",
+      "roundsDone": 2,
+      "roundsTotal": 8,
+      "color": "#0066b1",
+      "drivers": [
+        { "name": "Frijns / Rast", "team": "BMW M Team WRT #20", "points": 35 },
+        { "name": "Buemi / Hartley / Hirakawa", "team": "Toyota #8", "points": 26 },
+        { "name": "van der Linde", "team": "BMW M Team WRT #20", "points": 25 },
+        { "name": "Conway / Kobayashi / de Vries", "team": "Toyota #7", "points": 25 },
+        { "name": "Magnussen / Marciello", "team": "BMW M Team WRT #15", "points": 18 }
+      ]
+    },
+    "nascar": {
+      "label": "NASCAR Cup — Drivers",
+      "roundsDone": 14,
+      "roundsTotal": 36,
+      "color": "#ffd200",
+      "drivers": [
+        { "name": "Tyler Reddick", "team": "23XI Toyota", "points": 500 },
+        { "name": "William Byron", "team": "Hendrick Chevrolet", "points": 480 },
+        { "name": "Kyle Larson", "team": "Hendrick Chevrolet", "points": 470 },
+        { "name": "Christopher Bell", "team": "Joe Gibbs Toyota", "points": 455 }
+      ]
+    },
+    "indycar": {
+      "label": "NTT IndyCar — Drivers",
+      "roundsDone": 6,
+      "roundsTotal": 17,
+      "color": "#1e5bc6",
+      "drivers": [
+        { "name": "Alex Palou", "team": "Chip Ganassi #10", "points": 273 },
+        { "name": "Pato O'Ward", "team": "Arrow McLaren #5", "points": 240 },
+        { "name": "Kyle Kirkwood", "team": "Andretti #27", "points": 224 },
+        { "name": "Christian Lundgaard", "team": "Arrow McLaren #7", "points": 195 }
+      ]
+    },
+    "wrc": {
+      "label": "FIA WRC — Drivers",
+      "asOf": "after Rally Portugal (R6)",
+      "roundsDone": 6,
+      "roundsTotal": 14,
+      "color": "#e60012",
+      "drivers": [
+        { "name": "Elfyn Evans", "team": "Toyota", "points": 123 },
+        { "name": "Takamoto Katsuta", "team": "Toyota", "points": 111 },
+        { "name": "Oliver Solberg", "team": "Toyota", "points": 92 },
+        { "name": "Adrien Fourmaux", "team": "Hyundai", "points": 79 },
+        { "name": "Sami Pajari", "team": "Toyota", "points": 78 },
+        { "name": "Sebastien Ogier", "team": "Toyota", "points": 67 },
+        { "name": "Thierry Neuville", "team": "Hyundai", "points": 65 }
+      ]
+    },
+    "supercars": {
+      "label": "Supercars — Drivers",
+      "asOf": "after Tasmania (R5)",
+      "roundsDone": 5,
+      "roundsTotal": 14,
+      "color": "#00843d",
+      "drivers": [
+        { "name": "Broc Feeney", "team": "Triple Eight Chevrolet", "points": 1211 },
+        { "name": "Matt Payne", "team": "Grove Ford", "points": 1121 },
+        { "name": "Brodie Kostecki", "team": "Dick Johnson Ford", "points": 1038 },
+        { "name": "Cameron Waters", "team": "Tickford Ford", "points": 934 },
+        { "name": "Kai Allen", "team": "Grove Ford", "points": 917 },
+        { "name": "Anton De Pasquale", "team": "Team 18 Chevrolet", "points": 908 },
+        { "name": "Ryan Wood", "team": "Walkinshaw Chevrolet", "points": 876 },
+        { "name": "Will Brown", "team": "Triple Eight Chevrolet", "points": 835 }
+      ]
+    }
+  }
+}

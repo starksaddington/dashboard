@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-06-20T12:55:24",
+  "totals": {
+    "prospects": 2534,
+    "emailable": 1278,
+    "drafted": 0,
+    "remaining": 822,
+    "forms": 1028,
+    "social": 228
+  },
+  "byTier": [
+    {
+      "name": "Satoshi",
+      "count": 75
+    },
+    {
+      "name": "Paddock",
+      "count": 739
+    },
+    {
+      "name": "Wen Moon",
+      "count": 1269
+    },
+    {
+      "name": "HODL",
+      "count": 451
+    }
+  ],
+  "byMotorsport": {
+    "established": 779,
+    "new": 1538,
+    "unset": 217
+  },
+  "byCategory": [
+    {
+      "name": "Crypto/Web3/AI",
+      "count": 512
+    },
+    {
+      "name": "Consumer/Creator",
+      "count": 496
+    },
+    {
+      "name": "New-to-Motorsport Brands",
+      "count": 428
+    },
+    {
+      "name": "Motorsport/Automotive",
+      "count": 403
+    },
+    {
+      "name": "Racing Series/Contingency",
+      "count": 293
+    },
+    {
+      "name": "Local FL/GA",
+      "count": 256
+    },
+    {
+      "name": "Sim Racing/Esports",
+      "count": 146
+    }
+  ],
+  "today": [],
+  "nextUp": [
+    "Stamp Seed",
+    "CryptoCloaks",
+    "Altair Technology"
+  ]
+}

@@ -1,0 +1,44 @@
+name: Refresh dashboard data
+
+# Re-runs the live snapshot and commits bundle.json. The commit triggers
+# Netlify's auto-deploy, so the public dashboard stays current hands-off.
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours (UTC)
+  workflow_dispatch: {}      # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write            # allow the workflow to commit & push bundle.json
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Regenerate bundle.json
+        run: python build_bundle.py
+
+      - name: Commit & push if data changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- bundle.json; then
+            echo "No data change; nothing to deploy."
+          else
+            git add bundle.json
+            git commit -m "Auto-refresh dashboard data [skip ci]"
+            git push
+            echo "Pushed fresh bundle.json -> Netlify will auto-deploy."
+          fi

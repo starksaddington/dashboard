@@ -1,0 +1,55 @@
+{
+  "_notes": "Upcoming rounds used for the hero + countdown cards. The dashboard counts down to the ISO datetime in 'start' (UTC). Keep a few future rounds per series; times are approximate — edit freely.",
+  "series": {
+    "imsa": {
+      "label": "IMSA WeatherTech",
+      "season": 2026,
+      "rounds": [
+        { "round": 7, "name": "Sahlen's Six Hours of The Glen", "circuit": "Watkins Glen", "country": "USA", "start": "2026-06-28T14:10:00Z" },
+        { "round": 8, "name": "Chevrolet Grand Prix", "circuit": "Canadian Tire Motorsport Park", "country": "Canada", "start": "2026-07-12T15:40:00Z" },
+        { "round": 9, "name": "IMSA SportsCar Weekend", "circuit": "Road America", "country": "USA", "start": "2026-08-02T15:35:00Z" },
+        { "round": 11, "name": "Motul Petit Le Mans", "circuit": "Road Atlanta", "country": "USA", "start": "2026-10-10T15:10:00Z" }
+      ]
+    },
+    "wec": {
+      "label": "FIA WEC",
+      "season": 2026,
+      "rounds": [
+        { "round": 3, "name": "24 Hours of Le Mans", "circuit": "Circuit de la Sarthe", "country": "France", "start": "2026-06-13T14:00:00Z" },
+        { "round": 4, "name": "6 Hours of São Paulo", "circuit": "Interlagos", "country": "Brazil", "start": "2026-07-12T14:00:00Z" },
+        { "round": 5, "name": "Lone Star Le Mans", "circuit": "Circuit of the Americas", "country": "USA", "start": "2026-09-06T17:00:00Z" },
+        { "round": 6, "name": "6 Hours of Fuji", "circuit": "Fuji Speedway", "country": "Japan", "start": "2026-09-27T05:00:00Z" },
+        { "round": 8, "name": "8 Hours of Bahrain", "circuit": "Bahrain International Circuit", "country": "Bahrain", "start": "2026-11-07T11:00:00Z" }
+      ]
+    },
+    "indycar": {
+      "label": "NTT IndyCar Series",
+      "season": 2026,
+      "rounds": [
+        { "round": 7, "name": "Chevrolet Detroit Grand Prix", "circuit": "Detroit Street Circuit", "country": "USA", "start": "2026-06-01T16:30:00Z" },
+        { "round": 8, "name": "XPEL Grand Prix at Road America", "circuit": "Road America", "country": "USA", "start": "2026-06-21T17:30:00Z" },
+        { "round": 9, "name": "Honda Indy 200 at Mid-Ohio", "circuit": "Mid-Ohio", "country": "USA", "start": "2026-07-05T17:00:00Z" },
+        { "round": 17, "name": "Music City Grand Prix (Finale)", "circuit": "Nashville Superspeedway", "country": "USA", "start": "2026-08-30T17:00:00Z" }
+      ]
+    },
+    "wrc": {
+      "label": "FIA WRC",
+      "season": 2026,
+      "rounds": [
+        { "round": 7, "name": "Rally Italia Sardegna", "circuit": "Olbia, Sardinia", "country": "Italy", "start": "2026-06-05T06:00:00Z" },
+        { "round": 8, "name": "Rally Estonia", "circuit": "Tartu", "country": "Estonia", "start": "2026-07-16T06:00:00Z" },
+        { "round": 9, "name": "Secto Rally Finland", "circuit": "Jyväskylä", "country": "Finland", "start": "2026-07-31T06:00:00Z" }
+      ]
+    },
+    "supercars": {
+      "label": "Repco Supercars",
+      "season": 2026,
+      "rounds": [
+        { "round": 6, "name": "Darwin Triple Crown", "circuit": "Hidden Valley Raceway", "country": "Australia", "start": "2026-06-20T03:00:00Z" },
+        { "round": 7, "name": "Townsville 500", "circuit": "Reid Park Street Circuit", "country": "Australia", "start": "2026-07-11T03:00:00Z" },
+        { "round": 11, "name": "Bathurst 1000", "circuit": "Mount Panorama", "country": "Australia", "start": "2026-10-11T01:00:00Z" },
+        { "round": 14, "name": "Adelaide Grand Final", "circuit": "Adelaide Street Circuit", "country": "Australia", "start": "2026-11-29T04:30:00Z" }
+      ]
+    }
+  }
+}

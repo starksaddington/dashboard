@@ -19,6 +19,7 @@ const PALETTE = ["#f7931a", "#3d8bff", "#2bd47a", "#c06bff", "#ff5b4a", "#ffd700
 
 let BUNDLE = null;
 let pointsChart = null, progressChart = null;
+let sponCatChart = null, sponTierChart = null;
 let countdownTargets = [];   // [{el, ts}] for the strip
 let heroTarget = null;       // ms
 let nascarTarget = null;     // ms
@@ -468,21 +469,26 @@ function renderMyRaces() {
 function renderOutreach() {
   const o = BUNDLE.outreach;
   const box = $("#sponsorBox");
+  if (sponCatChart) { sponCatChart.destroy(); sponCatChart = null; }
+  if (sponTierChart) { sponTierChart.destroy(); sponTierChart = null; }
   if (!o || !o.totals) {
     box.innerHTML = `<div class="news-empty">No outreach data yet — run outreach_stats.py.</div>`;
     return;
   }
   const t = o.totals;
   const pct = t.emailable ? Math.round(t.drafted / t.emailable * 100) : 0;
+  const emRate = t.prospects ? Math.round(t.emailable / t.prospects * 100) : 0;
+  const formRate = t.prospects ? Math.round(t.forms / t.prospects * 100) : 0;
   const ms = o.byMotorsport || {};
   const chips = (arr) => (arr && arr.length)
     ? arr.map(x => `<span class="spon-chip">${esc(x)}</span>`).join("")
     : `<span class="spon-chip muted">—</span>`;
-  const tierChips = (o.byTier || []).map(x =>
-    `<span class="spon-chip"><b>${x.count}</b> ${esc(x.name)}</span>`).join("");
   const today = o.today || [];
   const shown = today.slice(0, 8);
   const more = today.length - shown.length;
+  const foot = [];
+  if (o.sheetUrl) foot.push(`<a href="${esc(o.sheetUrl)}" target="_blank" rel="noopener">Open tracker ↗</a>`);
+  if (o.draftsUrl) foot.push(`<a href="${esc(o.draftsUrl)}" target="_blank" rel="noopener">Review drafts in Gmail ↗</a>`);
   box.innerHTML =
     `<div class="spon-stats">
        <div class="spon-stat"><b>${t.prospects}</b><label>prospects</label></div>
@@ -491,21 +497,50 @@ function renderOutreach() {
        <div class="spon-stat"><b>${t.remaining}</b><label>to go</label></div>
        <div class="spon-stat"><b>${t.forms}</b><label>forms</label></div>
      </div>
+     <div class="spon-pct">
+       <span class="p"><b>${emRate}%</b> emailable</span>
+       <span class="p"><b>${pct}%</b> of emailable drafted</span>
+       <span class="p"><b>${formRate}%</b> form-only</span>
+     </div>
      <div class="spon-bar"><div class="spon-bar-fill" style="width:${pct}%"></div>
        <span class="spon-bar-tx">${t.drafted} / ${t.emailable} emailable drafted</span></div>
+     <div class="spon-charts">
+       <div class="spon-donut"><canvas id="sponCatChart"></canvas><span class="spon-donut-cap">Prospects by category</span></div>
+       <div class="spon-donut"><canvas id="sponTierChart"></canvas><span class="spon-donut-cap">Prospects by tier</span></div>
+     </div>
      <div class="spon-rows">
-       <div class="spon-line"><span class="spon-k">By tier</span><div class="spon-vals">${tierChips}</div></div>
        <div class="spon-line"><span class="spon-k">Motorsport</span><div class="spon-vals">
          <span class="spon-chip">🏁 <b>${ms.established || 0}</b> established</span>
          <span class="spon-chip new">🚀 <b>${ms.new || 0}</b> new to the sport</span></div></div>
        <div class="spon-line"><span class="spon-k">✅ Drafted today</span><div class="spon-vals">${chips(shown)}${more > 0 ? `<span class="spon-chip muted">+${more}</span>` : ""}</div></div>
        <div class="spon-line"><span class="spon-k">⏭ Next up</span><div class="spon-vals">${chips(o.nextUp)}</div></div>
      </div>
-     <div class="spon-foot">
-       <a href="${esc(o.sheetUrl || "#")}" target="_blank" rel="noopener">Open tracker ↗</a>
-       <a href="${esc(o.draftsUrl || "#")}" target="_blank" rel="noopener">Review drafts in Gmail ↗</a>
+     ${(foot.length || o.generatedAt) ? `<div class="spon-foot">${foot.join("")}
        <span class="spon-when">updated ${esc((o.generatedAt || "").replace("T", " ").slice(0, 16))}</span>
-     </div>`;
+     </div>` : ""}`;
+
+  const donutOpts = () => ({
+    responsive: true, maintainAspectRatio: false, cutout: "58%",
+    plugins: {
+      legend: { position: "bottom", labels: { color: "#c9c3b8", boxWidth: 10, font: { size: 10 }, padding: 6 } },
+      tooltip: {
+        backgroundColor: "#0a0d14", borderColor: "#2c2a26", borderWidth: 1, padding: 8,
+        callbacks: { label: (c) => ` ${c.label}: ${c.parsed}` },
+      },
+    },
+  });
+  const cat = (o.byCategory || []).slice(0, 7);
+  if (cat.length) sponCatChart = new Chart($("#sponCatChart"), {
+    type: "doughnut",
+    data: { labels: cat.map(c => c.name), datasets: [{ data: cat.map(c => c.count), backgroundColor: PALETTE, borderWidth: 0 }] },
+    options: donutOpts(),
+  });
+  const tier = (o.byTier || []).filter(x => x.count);
+  if (tier.length) sponTierChart = new Chart($("#sponTierChart"), {
+    type: "doughnut",
+    data: { labels: tier.map(x => x.name), datasets: [{ data: tier.map(x => x.count), backgroundColor: ["#f7931a", "#3d8bff", "#2bd47a", "#c06bff"], borderWidth: 0 }] },
+    options: donutOpts(),
+  });
 }
 
 /* ---------- Daily Grid (recurring to-dos) ---------- */

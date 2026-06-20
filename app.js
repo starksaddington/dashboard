@@ -1,4 +1,4 @@
-﻿/* Enzo's Morning Dashboard â€” front-end
+/* Enzo's Morning Dashboard — front-end
    Pulls everything from /api/bundle, then renders the brief and keeps the
    clocks & countdowns ticking. No build step, no framework. */
 
@@ -6,14 +6,14 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 const SERIES_META = {
-  supercars: { label: "Supercars", color: "#00843d", flag: "ðŸ‡¦ðŸ‡º" },
-  wec:     { label: "WEC",     color: "#0066b1", flag: "ðŸŒ" },
-  imsa:    { label: "IMSA",    color: "#d5001c", flag: "ðŸ‡ºðŸ‡¸" },
-  nascar:  { label: "NASCAR",  color: "#ffd200", flag: "ðŸ‡ºðŸ‡¸" },
-  indycar: { label: "IndyCar", color: "#3d8bff", flag: "ðŸ" },
-  wrc:     { label: "WRC",     color: "#e60012", flag: "ðŸŒ²" },
-  f1:      { label: "F1",      color: "#e10600", flag: "ðŸŽï¸" },
-  all:     { label: "All",     color: "#9aa6bd", flag: "ðŸ“¡" },
+  supercars: { label: "Supercars", color: "#00843d", flag: "🇦🇺" },
+  wec:     { label: "WEC",     color: "#0066b1", flag: "🌍" },
+  imsa:    { label: "IMSA",    color: "#d5001c", flag: "🇺🇸" },
+  nascar:  { label: "NASCAR",  color: "#ffd200", flag: "🇺🇸" },
+  indycar: { label: "IndyCar", color: "#3d8bff", flag: "🏁" },
+  wrc:     { label: "WRC",     color: "#e60012", flag: "🌲" },
+  f1:      { label: "F1",      color: "#e10600", flag: "🏎️" },
+  all:     { label: "All",     color: "#9aa6bd", flag: "📡" },
 };
 const PALETTE = ["#f7931a", "#3d8bff", "#2bd47a", "#c06bff", "#ff5b4a", "#ffd700", "#19c0d8", "#ff9f1c"];
 
@@ -68,14 +68,14 @@ function renderGreeting() {
   const cfg = BUNDLE.config || {};
   const h = new Date().getHours();
   const phase = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
-  $("#greetTime").textContent = phase + " Â· race brief";
+  $("#greetTime").textContent = phase + " · race brief";
   const name = (cfg.name || "").trim();
   $("#greetName").textContent = name ? `${phase}, ${name}` : "Welcome back, racer";
   if (cfg.tagline) $("#tagline").textContent = cfg.tagline;
 
   const chips = [];
-  (cfg.favoriteDrivers || []).slice(0, 4).forEach(d => chips.push(`<span class="chip"><i>â—</i>${esc(d)}</span>`));
-  (cfg.favoriteTeams || []).slice(0, 2).forEach(t => chips.push(`<span class="chip"><i>â–°</i>${esc(t)}</span>`));
+  (cfg.favoriteDrivers || []).slice(0, 4).forEach(d => chips.push(`<span class="chip"><i>●</i>${esc(d)}</span>`));
+  (cfg.favoriteTeams || []).slice(0, 2).forEach(t => chips.push(`<span class="chip"><i>▰</i>${esc(t)}</span>`));
   $("#favChips").innerHTML = chips.join("");
 
   const dr = cfg.driver;
@@ -86,7 +86,7 @@ function renderGreeting() {
       `<div class="num">${esc(dr.number || "")}<small>${esc(dr.carClass || "")}</small></div>
        ${dr.kanji ? `<div class="kanji">${esc(dr.kanji)}</div>` : ""}
        <div class="dinfo">
-         <b>${esc(dr.nickname || dr.name || "")}${dr.name ? " Â· " + esc(dr.name) : ""}</b>
+         <b>${esc(dr.nickname || dr.name || "")}${dr.name ? " · " + esc(dr.name) : ""}</b>
          <span>${esc(dr.series || "")}</span>
          <em>${esc(dr.note || (cfg.team && cfg.team.motto) || "")}</em>
        </div>`;
@@ -106,13 +106,13 @@ function renderHQ() {
     `<div class="hq-hero">
        <div class="bignum">${esc(dr.number || "")}</div>
        <div class="htxt"><b>${esc(dr.nickname || dr.name)} ${dr.kanji ? esc(dr.kanji) : ""}</b>
-         <span>${esc(dr.name || "")} Â· ${esc(team.name || "")}</span></div>
+         <span>${esc(dr.name || "")} · ${esc(team.name || "")}</span></div>
      </div>
      <div class="hq-spec">
-       <div class="m"><label>Class</label><span>${esc(dr.carClass || "â€”")}</span></div>
-       <div class="m"><label>Spec</label><span>${esc(dr.carSpec || "â€”")}</span></div>
-       <div class="m"><label>Series</label><span>${esc(dr.series || "â€”")}</span></div>
-       <div class="m"><label>Mission</label><span>${esc(team.motto || "â€”")}</span></div>
+       <div class="m"><label>Class</label><span>${esc(dr.carClass || "—")}</span></div>
+       <div class="m"><label>Spec</label><span>${esc(dr.carSpec || "—")}</span></div>
+       <div class="m"><label>Series</label><span>${esc(dr.series || "—")}</span></div>
+       <div class="m"><label>Mission</label><span>${esc(team.motto || "—")}</span></div>
      </div>
      <div class="hq-links">${links}</div>`;
 }
@@ -130,7 +130,7 @@ function buildEvents() {
         series: key,
         seriesLabel: s.label || (SERIES_META[key] || {}).label || key,
         name: r.name,
-        loc: [r.circuit, r.country].filter(Boolean).join(" Â· "),
+        loc: [r.circuit, r.country].filter(Boolean).join(" · "),
         round: r.round,
         ts,
       });
@@ -155,11 +155,11 @@ function renderHero(events) {
   const next = events.find(e => e.ts > now) || events[0];
   if (!next) { $("#heroRace").textContent = "No upcoming rounds scheduled."; return; }
   const m = SERIES_META[next.series] || {};
-  $("#heroSeries").textContent = `${m.flag || "ðŸ"} ${next.seriesLabel}`;
+  $("#heroSeries").textContent = `${m.flag || "🏁"} ${next.seriesLabel}`;
   $("#heroRace").textContent = next.name;
   $("#heroMeta").textContent = [next.loc,
     new Date(next.ts).toLocaleString([], { weekday: "long", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
-  ].filter(Boolean).join("  Â·  ");
+  ].filter(Boolean).join("  ·  ");
   heroTarget = next.ts;
 }
 
@@ -174,7 +174,7 @@ function renderStrip(events) {
     if (!ev) {
       return `<div class="cd-card"><span class="bar" style="background:${m.color}"></span>
         <div class="ser">${m.label || key}</div><div class="rnd">TBA</div>
-        <div class="loc">schedule to come</div><div class="tmr">â€”</div></div>`;
+        <div class="loc">schedule to come</div><div class="tmr">—</div></div>`;
     }
     const id = "cd_" + key;
     countdownTargets.push({ id, ts: ev.ts });
@@ -182,7 +182,7 @@ function renderStrip(events) {
       <div class="ser">${m.flag || ""} ${m.label || key}</div>
       <div class="rnd">${esc(ev.name)}</div>
       <div class="loc">${esc(ev.loc || "")}</div>
-      <div class="tmr" id="${id}">â€”</div></div>`;
+      <div class="tmr" id="${id}">—</div></div>`;
   });
   $("#countdownStrip").innerHTML = cards.join("");
 }
@@ -285,25 +285,25 @@ function drawChampionship(key) {
     },
   });
   $("#chartLegend").innerHTML =
-    `<span class="lg" style="color:#9d978c">${esc(info.label || "")} Â· current championship points` +
-    (info.live ? ` Â· <span style="color:var(--green)">live ${esc(info.source)}</span>`
-               : (info.asOf ? ` Â· <span style="color:#9d978c">${esc(info.asOf)}</span>` : "")) + `</span>`;
+    `<span class="lg" style="color:#9d978c">${esc(info.label || "")} · current championship points` +
+    (info.live ? ` · <span style="color:var(--green)">live ${esc(info.source)}</span>`
+               : (info.asOf ? ` · <span style="color:#9d978c">${esc(info.asOf)}</span>` : "")) + `</span>`;
 
   drawStandings(key, info);
 }
 
 function drawStandings(key, info) {
   info = info || getRows(key);
-  $("#standTitle").textContent = "ðŸ† " + (info.label || "Standings");
+  $("#standTitle").textContent = "🏆 " + (info.label || "Standings");
   const src = $("#standSrc");
   if (info.live) {
-    src.textContent = "live Â· " + info.source;
+    src.textContent = "live · " + info.source;
     src.className = "src-badge live";
     src.title = "Updated " + (info.updatedAt || "");
   } else {
-    src.textContent = "manual" + (info.asOf ? " Â· " + info.asOf : "");
+    src.textContent = "manual" + (info.asOf ? " · " + info.asOf : "");
     src.className = "src-badge manual";
-    src.title = "Edit data/standings.json â€” no public live feed for this series";
+    src.title = "Edit data/standings.json — no public live feed for this series";
   }
   const ranked = info.rows;
   const lead = ranked[0] ? ranked[0].points : 0;
@@ -311,7 +311,7 @@ function drawStandings(key, info) {
     `<div class="st-row p${i + 1}">
        <div class="pos">${i + 1}</div>
        <div class="who"><div class="nm">${esc(d.name)}</div><div class="tm">${esc(d.team || "")}</div></div>
-       <div class="pts">${d.points}<small>pts ${i === 0 ? "" : "âˆ’" + (lead - d.points)}</small></div>
+       <div class="pts">${d.points}<small>pts ${i === 0 ? "" : "−" + (lead - d.points)}</small></div>
      </div>`).join("");
 }
 
@@ -371,15 +371,15 @@ function renderNascar() {
       <div class="ntrk">${esc(nx.track || "")}</div>
       <div class="nmeta">
         <div class="m"><label>Green flag</label><span>${nx.ts ? new Date(nx.ts * 1000).toLocaleDateString([], { month: "short", day: "numeric" }) : "TBA"}</span></div>
-        <div class="m"><label>Laps</label><span>${nx.laps || "â€”"}</span></div>
-        <div class="m"><label>TV</label><span>${esc(nx.tv || "â€”")}</span></div>
-        <div class="m"><label>Countdown</label><span id="nascarCd">â€”</span></div>
+        <div class="m"><label>Laps</label><span>${nx.laps || "—"}</span></div>
+        <div class="m"><label>TV</label><span>${esc(nx.tv || "—")}</span></div>
+        <div class="m"><label>Countdown</label><span id="nascarCd">—</span></div>
       </div>`;
   }
   if (last) {
-    html += `<div class="nlast">Last out: <b>${esc(last.name || "")}</b> â€” ${esc(last.track || "")}</div>`;
+    html += `<div class="nlast">Last out: <b>${esc(last.name || "")}</b> — ${esc(last.track || "")}</div>`;
   }
-  box.innerHTML = html || `<div class="ntrk">Schedule loadingâ€¦</div>`;
+  box.innerHTML = html || `<div class="ntrk">Schedule loading…</div>`;
 }
 
 /* ---------- news ---------- */
@@ -445,8 +445,8 @@ function renderMyRaces() {
     const isNext = i === nextIdx;
     const dayN = Math.round((r.ts - t0) / 864e5);
     let stat;
-    if (past) stat = "âœ“ done";
-    else if (isNext) stat = `<span class="nx-badge">next Â· ${dayN === 0 ? "today" : "in " + dayN + "d"}</span>`;
+    if (past) stat = "✓ done";
+    else if (isNext) stat = `<span class="nx-badge">next · ${dayN === 0 ? "today" : "in " + dayN + "d"}</span>`;
     else stat = "in " + dayN + " days";
     const when = r.dateLabel
       ? `<b>${esc(r.dateLabel.replace(/^\w+ /, ""))}</b><span>${esc(r.dateLabel.split(" ")[0])}</span>`
@@ -461,7 +461,7 @@ function renderMyRaces() {
 
   const done = dated.filter(r => r.ts < t0).length;
   $("#myRacesCap").textContent =
-    `${done} of ${dated.length} rounds complete Â· source: ${(BUNDLE.config && BUNDLE.config.racesSource) || "config.json"} Â· edit data/config.json`;
+    `${done} of ${dated.length} rounds complete · source: ${(BUNDLE.config && BUNDLE.config.racesSource) || "config.json"} · edit data/config.json`;
 }
 
 /* ---------- Sponsor Pipeline (live from the Racing Contacts sheet) ---------- */
@@ -469,7 +469,7 @@ function renderOutreach() {
   const o = BUNDLE.outreach;
   const box = $("#sponsorBox");
   if (!o || !o.totals) {
-    box.innerHTML = `<div class="news-empty">No outreach data yet â€” run outreach_stats.py.</div>`;
+    box.innerHTML = `<div class="news-empty">No outreach data yet — run outreach_stats.py.</div>`;
     return;
   }
   const t = o.totals;
@@ -477,7 +477,7 @@ function renderOutreach() {
   const ms = o.byMotorsport || {};
   const chips = (arr) => (arr && arr.length)
     ? arr.map(x => `<span class="spon-chip">${esc(x)}</span>`).join("")
-    : `<span class="spon-chip muted">â€”</span>`;
+    : `<span class="spon-chip muted">—</span>`;
   const tierChips = (o.byTier || []).map(x =>
     `<span class="spon-chip"><b>${x.count}</b> ${esc(x.name)}</span>`).join("");
   const today = o.today || [];
@@ -496,14 +496,14 @@ function renderOutreach() {
      <div class="spon-rows">
        <div class="spon-line"><span class="spon-k">By tier</span><div class="spon-vals">${tierChips}</div></div>
        <div class="spon-line"><span class="spon-k">Motorsport</span><div class="spon-vals">
-         <span class="spon-chip">ðŸ <b>${ms.established || 0}</b> established</span>
-         <span class="spon-chip new">ðŸš€ <b>${ms.new || 0}</b> new to the sport</span></div></div>
-       <div class="spon-line"><span class="spon-k">âœ… Drafted today</span><div class="spon-vals">${chips(shown)}${more > 0 ? `<span class="spon-chip muted">+${more}</span>` : ""}</div></div>
-       <div class="spon-line"><span class="spon-k">â­ Next up</span><div class="spon-vals">${chips(o.nextUp)}</div></div>
+         <span class="spon-chip">🏁 <b>${ms.established || 0}</b> established</span>
+         <span class="spon-chip new">🚀 <b>${ms.new || 0}</b> new to the sport</span></div></div>
+       <div class="spon-line"><span class="spon-k">✅ Drafted today</span><div class="spon-vals">${chips(shown)}${more > 0 ? `<span class="spon-chip muted">+${more}</span>` : ""}</div></div>
+       <div class="spon-line"><span class="spon-k">⏭ Next up</span><div class="spon-vals">${chips(o.nextUp)}</div></div>
      </div>
      <div class="spon-foot">
-       <a href="${esc(o.sheetUrl || "#")}" target="_blank" rel="noopener">Open tracker â†—</a>
-       <a href="${esc(o.draftsUrl || "#")}" target="_blank" rel="noopener">Review drafts in Gmail â†—</a>
+       <a href="${esc(o.sheetUrl || "#")}" target="_blank" rel="noopener">Open tracker ↗</a>
+       <a href="${esc(o.draftsUrl || "#")}" target="_blank" rel="noopener">Review drafts in Gmail ↗</a>
        <span class="spon-when">updated ${esc((o.generatedAt || "").replace("T", " ").slice(0, 16))}</span>
      </div>`;
 }
@@ -522,7 +522,7 @@ function saveDaily(s) { localStorage.setItem("enzo.daily", JSON.stringify(s)); }
 function renderDailyGrid() {
   const cfg = (BUNDLE.config && BUNDLE.config.dailyTasks) || {};
   const tasks = cfg.tasks || [];
-  $("#dailyTitle").textContent = "âœ… " + (cfg.title || "Daily Grid");
+  $("#dailyTitle").textContent = "✅ " + (cfg.title || "Daily Grid");
   $("#dailySub").textContent = cfg.subtitle || "";
   const grid = $("#dailyGrid");
   if (!tasks.length) { grid.innerHTML = `<div class="news-empty">Add tasks under "dailyTasks" in config.json.</div>`; return; }
@@ -535,10 +535,10 @@ function renderDailyGrid() {
   grid.innerHTML = tasks.map(t => {
     const on = !!checked[t.id];
     const links = (t.links || []).map(l =>
-      `<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label)} â†—</a>`).join("");
+      `<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label)} ↗</a>`).join("");
     return `<div class="task-card ${on ? "done" : ""}" data-id="${esc(t.id)}">
       <div class="task-check"></div>
-      <div class="task-ico">${esc(t.icon || "â€¢")}</div>
+      <div class="task-ico">${esc(t.icon || "•")}</div>
       <div class="task-main">
         <div class="task-top"><span class="task-title">${esc(t.title)}</span>${t.tag ? `<span class="task-tag">${esc(t.tag)}</span>` : ""}</div>
         <p class="task-desc">${esc(t.desc || "")}</p>
@@ -617,7 +617,7 @@ function renderStreak() {
   const streak = JSON.parse(localStorage.getItem("enzo.streak") || "{}");
   const n = streak.count || 0;
   const el = $("#dailyStreak");
-  el.innerHTML = `ðŸ”¥ <b>${n}</b> day${n === 1 ? "" : "s"}` + (streak.best ? ` Â· best ${streak.best}` : "");
+  el.innerHTML = `🔥 <b>${n}</b> day${n === 1 ? "" : "s"}` + (streak.best ? ` · best ${streak.best}` : "");
 }
 
 function burstConfetti(card) {
@@ -664,4 +664,3 @@ function timeAgo(str) {
   if (diff < 86400) return Math.round(diff / 3600) + " hr ago";
   return Math.round(diff / 86400) + " d ago";
 }
-

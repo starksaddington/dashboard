@@ -1,0 +1,667 @@
+﻿/* Enzo's Morning Dashboard â€” front-end
+   Pulls everything from /api/bundle, then renders the brief and keeps the
+   clocks & countdowns ticking. No build step, no framework. */
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+const SERIES_META = {
+  supercars: { label: "Supercars", color: "#00843d", flag: "ðŸ‡¦ðŸ‡º" },
+  wec:     { label: "WEC",     color: "#0066b1", flag: "ðŸŒ" },
+  imsa:    { label: "IMSA",    color: "#d5001c", flag: "ðŸ‡ºðŸ‡¸" },
+  nascar:  { label: "NASCAR",  color: "#ffd200", flag: "ðŸ‡ºðŸ‡¸" },
+  indycar: { label: "IndyCar", color: "#3d8bff", flag: "ðŸ" },
+  wrc:     { label: "WRC",     color: "#e60012", flag: "ðŸŒ²" },
+  f1:      { label: "F1",      color: "#e10600", flag: "ðŸŽï¸" },
+  all:     { label: "All",     color: "#9aa6bd", flag: "ðŸ“¡" },
+};
+const PALETTE = ["#f7931a", "#3d8bff", "#2bd47a", "#c06bff", "#ff5b4a", "#ffd700", "#19c0d8", "#ff9f1c"];
+
+let BUNDLE = null;
+let pointsChart = null, progressChart = null;
+let countdownTargets = [];   // [{el, ts}] for the strip
+let heroTarget = null;       // ms
+let nascarTarget = null;     // ms
+
+document.addEventListener("DOMContentLoaded", () => {
+  tickClock();
+  setInterval(tickClock, 1000);
+  setInterval(tickCountdowns, 1000);
+  $("#refreshBtn").addEventListener("click", () => load(true));
+  load(false);
+});
+
+async function load(isRefresh) {
+  const btn = $("#refreshBtn");
+  if (isRefresh) btn.classList.add("spin");
+  try {
+    const res = await fetch("bundle.json", { cache: "no-store" });
+    BUNDLE = await res.json();
+    renderAll();
+  } catch (e) {
+    console.error(e);
+    $("#heroRace").textContent = "Could not reach the data server.";
+  } finally {
+    if (isRefresh) setTimeout(() => btn.classList.remove("spin"), 500);
+  }
+}
+
+function renderAll() {
+  renderGreeting();
+  const events = buildEvents();
+  renderHero(events);
+  renderStrip(events);
+  renderChartTabs();
+  renderProgress();
+  renderHQ();
+  renderNewsTabs();
+  renderLinks();
+  renderMyRaces();
+  renderOutreach();
+  renderDailyGrid();
+  $("#footStamp").textContent =
+    "Updated " + new Date().toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+/* ---------- greeting ---------- */
+function renderGreeting() {
+  const cfg = BUNDLE.config || {};
+  const h = new Date().getHours();
+  const phase = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  $("#greetTime").textContent = phase + " Â· race brief";
+  const name = (cfg.name || "").trim();
+  $("#greetName").textContent = name ? `${phase}, ${name}` : "Welcome back, racer";
+  if (cfg.tagline) $("#tagline").textContent = cfg.tagline;
+
+  const chips = [];
+  (cfg.favoriteDrivers || []).slice(0, 4).forEach(d => chips.push(`<span class="chip"><i>â—</i>${esc(d)}</span>`));
+  (cfg.favoriteTeams || []).slice(0, 2).forEach(t => chips.push(`<span class="chip"><i>â–°</i>${esc(t)}</span>`));
+  $("#favChips").innerHTML = chips.join("");
+
+  const dr = cfg.driver;
+  const badge = $("#driverBadge");
+  if (dr) {
+    badge.style.display = "flex";
+    badge.innerHTML =
+      `<div class="num">${esc(dr.number || "")}<small>${esc(dr.carClass || "")}</small></div>
+       ${dr.kanji ? `<div class="kanji">${esc(dr.kanji)}</div>` : ""}
+       <div class="dinfo">
+         <b>${esc(dr.nickname || dr.name || "")}${dr.name ? " Â· " + esc(dr.name) : ""}</b>
+         <span>${esc(dr.series || "")}</span>
+         <em>${esc(dr.note || (cfg.team && cfg.team.motto) || "")}</em>
+       </div>`;
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+function renderHQ() {
+  const cfg = BUNDLE.config || {};
+  const dr = cfg.driver, team = cfg.team || {};
+  const box = $("#hqBox");
+  if (!dr) { box.innerHTML = `<div class="news-empty">Add a "driver" block to config.json.</div>`; return; }
+  const links = (cfg.links || []).filter(l => /saddington|bitcoin|youtube|tiktok/i.test(l.label))
+    .map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
+  box.innerHTML =
+    `<div class="hq-hero">
+       <div class="bignum">${esc(dr.number || "")}</div>
+       <div class="htxt"><b>${esc(dr.nickname || dr.name)} ${dr.kanji ? esc(dr.kanji) : ""}</b>
+         <span>${esc(dr.name || "")} Â· ${esc(team.name || "")}</span></div>
+     </div>
+     <div class="hq-spec">
+       <div class="m"><label>Class</label><span>${esc(dr.carClass || "â€”")}</span></div>
+       <div class="m"><label>Spec</label><span>${esc(dr.carSpec || "â€”")}</span></div>
+       <div class="m"><label>Series</label><span>${esc(dr.series || "â€”")}</span></div>
+       <div class="m"><label>Mission</label><span>${esc(team.motto || "â€”")}</span></div>
+     </div>
+     <div class="hq-links">${links}</div>`;
+}
+
+/* ---------- events / countdowns ---------- */
+function buildEvents() {
+  const out = [];
+  const cal = (BUNDLE.calendar && BUNDLE.calendar.series) || {};
+  for (const key of Object.keys(cal)) {
+    const s = cal[key];
+    (s.rounds || []).forEach(r => {
+      const ts = Date.parse(r.start);
+      if (!isFinite(ts)) return;
+      out.push({
+        series: key,
+        seriesLabel: s.label || (SERIES_META[key] || {}).label || key,
+        name: r.name,
+        loc: [r.circuit, r.country].filter(Boolean).join(" Â· "),
+        round: r.round,
+        ts,
+      });
+    });
+  }
+  // fold in the live NASCAR next race
+  const nx = BUNDLE.nascar && BUNDLE.nascar.next;
+  if (nx && nx.ts) {
+    out.push({
+      series: "nascar",
+      seriesLabel: "NASCAR Cup",
+      name: nx.name,
+      loc: nx.track,
+      ts: nx.ts * 1000,
+    });
+  }
+  return out.sort((a, b) => a.ts - b.ts);
+}
+
+function renderHero(events) {
+  const now = Date.now();
+  const next = events.find(e => e.ts > now) || events[0];
+  if (!next) { $("#heroRace").textContent = "No upcoming rounds scheduled."; return; }
+  const m = SERIES_META[next.series] || {};
+  $("#heroSeries").textContent = `${m.flag || "ðŸ"} ${next.seriesLabel}`;
+  $("#heroRace").textContent = next.name;
+  $("#heroMeta").textContent = [next.loc,
+    new Date(next.ts).toLocaleString([], { weekday: "long", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+  ].filter(Boolean).join("  Â·  ");
+  heroTarget = next.ts;
+}
+
+function renderStrip(events) {
+  const now = Date.now();
+  const order = (BUNDLE.config && BUNDLE.config.seriesOrder) || ["wec", "imsa", "nascar", "indycar", "wrc"];
+  countdownTargets = [];
+  const cards = order.map(key => {
+    const ev = events.find(e => e.series === key && e.ts > now)
+            || events.filter(e => e.series === key).pop();
+    const m = SERIES_META[key] || {};
+    if (!ev) {
+      return `<div class="cd-card"><span class="bar" style="background:${m.color}"></span>
+        <div class="ser">${m.label || key}</div><div class="rnd">TBA</div>
+        <div class="loc">schedule to come</div><div class="tmr">â€”</div></div>`;
+    }
+    const id = "cd_" + key;
+    countdownTargets.push({ id, ts: ev.ts });
+    return `<div class="cd-card"><span class="bar" style="background:${m.color}"></span>
+      <div class="ser">${m.flag || ""} ${m.label || key}</div>
+      <div class="rnd">${esc(ev.name)}</div>
+      <div class="loc">${esc(ev.loc || "")}</div>
+      <div class="tmr" id="${id}">â€”</div></div>`;
+  });
+  $("#countdownStrip").innerHTML = cards.join("");
+}
+
+function tickCountdowns() {
+  const now = Date.now();
+  if (heroTarget) {
+    const d = Math.max(0, heroTarget - now);
+    const p = parts(d);
+    set("#cd-d", p.d); set("#cd-h", p.h); set("#cd-m", p.m); set("#cd-s", p.s);
+  }
+  countdownTargets.forEach(t => {
+    const el = document.getElementById(t.id);
+    if (!el) return;
+    const d = t.ts - now;
+    el.parentElement.classList.toggle("soon", d > 0 && d < 3 * 864e5);
+    el.innerHTML = d <= 0 ? "<small>under way / done</small>" : compact(d);
+  });
+  if (nascarTarget) {
+    const el = $("#nascarCd");
+    if (el) { const d = nascarTarget - now; el.textContent = d <= 0 ? "Race weekend!" : "in " + compact(d, true); }
+  }
+}
+
+function parts(ms) {
+  const s = Math.floor(ms / 1000);
+  return { d: String(Math.floor(s / 86400)).padStart(2, "0"),
+           h: String(Math.floor(s % 86400 / 3600)).padStart(2, "0"),
+           m: String(Math.floor(s % 3600 / 60)).padStart(2, "0"),
+           s: String(s % 60).padStart(2, "0") };
+}
+function compact(ms, plain) {
+  const p = parts(ms);
+  if (+p.d > 0) return `${+p.d}<small>d</small> ${+p.h}<small>h</small>`;
+  return plain ? `${+p.h}h ${+p.m}m` : `${+p.h}<small>h</small> ${+p.m}<small>m</small> ${p.s}<small>s</small>`;
+}
+
+/* ---------- championship chart + standings ----------
+   Both views share one source: getRows() returns ranked {name,team,points}
+   from the server's live ESPN table when present, else the editable JSON.   */
+function getRows(key) {
+  const data = (BUNDLE.standings.series || {})[key] || {};
+  const live = data.live && data.live.table;
+  if (live && live.length) {
+    return {
+      label: data.label, color: data.color,
+      live: true, source: data.live.source || "ESPN", updatedAt: data.live.updatedAt,
+      rows: live.map(r => ({ name: r.name, team: r.team || "", points: r.points })),
+    };
+  }
+  const rows = (data.drivers || [])
+    .map(d => ({ name: d.name, team: d.team || "", points: d.points }))
+    .sort((a, b) => b.points - a.points);
+  return { label: data.label, color: data.color, live: false,
+           source: "manual", asOf: data.asOf, rows };
+}
+
+function renderChartTabs() {
+  const st = (BUNDLE.standings && BUNDLE.standings.series) || {};
+  const order = ((BUNDLE.config && BUNDLE.config.seriesOrder) || Object.keys(st)).filter(k => st[k]);
+  const tabs = $("#chartTabs");
+  tabs.innerHTML = order.map((k, i) =>
+    `<button data-k="${k}" class="${i === 0 ? "on" : ""}">${(SERIES_META[k] || {}).label || k}</button>`).join("");
+  $$("#chartTabs button").forEach(b => b.addEventListener("click", () => {
+    $$("#chartTabs button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    drawChampionship(b.dataset.k);
+  }));
+  if (order[0]) drawChampionship(order[0]);
+}
+
+function drawChampionship(key) {
+  const info = getRows(key);
+  const top = info.rows.slice(0, 8);
+
+  // --- bar chart of current points ---
+  const base = info.color || (SERIES_META[key] || {}).color || "#f7931a";
+  const colors = top.map((_, i) => i === 0 ? base : base + (i === 1 ? "cc" : i === 2 ? "99" : "66"));
+  if (pointsChart) pointsChart.destroy();
+  pointsChart = new Chart($("#pointsChart"), {
+    type: "bar",
+    data: {
+      labels: top.map(r => shortName(r.name)),
+      datasets: [{ label: "Points", data: top.map(r => r.points),
+        backgroundColor: colors, borderRadius: 6, maxBarThickness: 30 }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#0a0d14", borderColor: "#2c2a26", borderWidth: 1, padding: 10,
+          callbacks: { afterLabel: (c) => top[c.dataIndex].team || "" },
+        },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: "#c9c3b8", font: { weight: 600 }, maxRotation: 40, minRotation: 0 } },
+        y: { grid: { color: "rgba(255,255,255,.05)" }, ticks: { color: "#9d978c" }, beginAtZero: true },
+      },
+    },
+  });
+  $("#chartLegend").innerHTML =
+    `<span class="lg" style="color:#9d978c">${esc(info.label || "")} Â· current championship points` +
+    (info.live ? ` Â· <span style="color:var(--green)">live ${esc(info.source)}</span>`
+               : (info.asOf ? ` Â· <span style="color:#9d978c">${esc(info.asOf)}</span>` : "")) + `</span>`;
+
+  drawStandings(key, info);
+}
+
+function drawStandings(key, info) {
+  info = info || getRows(key);
+  $("#standTitle").textContent = "ðŸ† " + (info.label || "Standings");
+  const src = $("#standSrc");
+  if (info.live) {
+    src.textContent = "live Â· " + info.source;
+    src.className = "src-badge live";
+    src.title = "Updated " + (info.updatedAt || "");
+  } else {
+    src.textContent = "manual" + (info.asOf ? " Â· " + info.asOf : "");
+    src.className = "src-badge manual";
+    src.title = "Edit data/standings.json â€” no public live feed for this series";
+  }
+  const ranked = info.rows;
+  const lead = ranked[0] ? ranked[0].points : 0;
+  $("#standingsTable").innerHTML = ranked.slice(0, 10).map((d, i) =>
+    `<div class="st-row p${i + 1}">
+       <div class="pos">${i + 1}</div>
+       <div class="who"><div class="nm">${esc(d.name)}</div><div class="tm">${esc(d.team || "")}</div></div>
+       <div class="pts">${d.points}<small>pts ${i === 0 ? "" : "âˆ’" + (lead - d.points)}</small></div>
+     </div>`).join("");
+}
+
+function shortName(n) {
+  // "Alex Palou" -> "Palou"; "Frijns / Rast" -> "Frijns/Rast"
+  if (n.includes("/")) return n.split("/").map(s => s.trim().split(" ").pop()).join("/");
+  const parts = n.trim().split(" ");
+  return parts.length > 1 ? parts[parts.length - 1] : n;
+}
+
+/* ---------- season progress ---------- */
+function renderProgress() {
+  const st = (BUNDLE.standings && BUNDLE.standings.series) || {};
+  const order = ((BUNDLE.config && BUNDLE.config.seriesOrder) || Object.keys(st)).filter(k => st[k]);
+  const keys = order;
+  const labels = keys.map(k => (SERIES_META[k] || {}).label || k);
+  const done = keys.map(k => st[k].roundsDone || 0);
+  const totals = keys.map(k => st[k].roundsTotal || 10);
+  const pct = done.map((d, i) => Math.round(d / totals[i] * 100));
+  if (progressChart) progressChart.destroy();
+  progressChart = new Chart($("#progressChart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "% of season", data: pct,
+        backgroundColor: keys.map(k => (SERIES_META[k] || {}).color || "#ff2b3e"),
+        borderRadius: 6, barThickness: 20,
+      }],
+    },
+    options: {
+      indexAxis: "y", responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => `${c.parsed.x}% (${done[c.dataIndex]}/${totals[c.dataIndex]} rounds)` },
+          backgroundColor: "#0a0d14", borderColor: "#222a3a", borderWidth: 1 } },
+      scales: {
+        x: { max: 100, grid: { color: "rgba(255,255,255,.05)" }, ticks: { color: "#8995ad", callback: v => v + "%" } },
+        y: { grid: { display: false }, ticks: { color: "#e9eef7", font: { weight: 600 } } },
+      },
+    },
+  });
+}
+
+/* ---------- NASCAR widget ---------- */
+function renderNascar() {
+  const n = BUNDLE.nascar || {};
+  const box = $("#nascarBox");
+  const badge = $("#nascarBadge");
+  if (!n.ok) { box.innerHTML = `<div class="ntrk">NASCAR feed offline right now.</div>`; badge.textContent = "offline"; badge.classList.add("stale"); return; }
+  badge.textContent = n.stale ? "cached" : "live";
+  badge.classList.toggle("stale", !!n.stale);
+  const nx = n.next, last = n.last;
+  let html = "";
+  if (nx) {
+    nascarTarget = nx.ts ? nx.ts * 1000 : null;
+    html += `<div class="nx">${esc(nx.name || "Next race")}</div>
+      <div class="ntrk">${esc(nx.track || "")}</div>
+      <div class="nmeta">
+        <div class="m"><label>Green flag</label><span>${nx.ts ? new Date(nx.ts * 1000).toLocaleDateString([], { month: "short", day: "numeric" }) : "TBA"}</span></div>
+        <div class="m"><label>Laps</label><span>${nx.laps || "â€”"}</span></div>
+        <div class="m"><label>TV</label><span>${esc(nx.tv || "â€”")}</span></div>
+        <div class="m"><label>Countdown</label><span id="nascarCd">â€”</span></div>
+      </div>`;
+  }
+  if (last) {
+    html += `<div class="nlast">Last out: <b>${esc(last.name || "")}</b> â€” ${esc(last.track || "")}</div>`;
+  }
+  box.innerHTML = html || `<div class="ntrk">Schedule loadingâ€¦</div>`;
+}
+
+/* ---------- news ---------- */
+function renderNewsTabs() {
+  const news = BUNDLE.news || {};
+  const order = ((BUNDLE.config && BUNDLE.config.seriesOrder) || []).filter(k => news[k]);
+  if (news.all) order.push("all");
+  $("#newsTabs").innerHTML = order.map((k, i) =>
+    `<button data-k="${k}" class="${i === 0 ? "on" : ""}">${(SERIES_META[k] || {}).label || k}</button>`).join("");
+  $$("#newsTabs button").forEach(b => b.addEventListener("click", () => {
+    $$("#newsTabs button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    drawNews(b.dataset.k);
+  }));
+  if (order[0]) drawNews(order[0]);
+  // also fill the NASCAR widget once news ready (nascar bundle is separate)
+  renderNascar();
+}
+
+function drawNews(key) {
+  const feed = (BUNDLE.news || {})[key] || {};
+  const items = feed.items || [];
+  const grid = $("#newsGrid");
+  if (!items.length) {
+    grid.innerHTML = `<div class="news-empty">No ${(SERIES_META[key] || {}).label || key} headlines right now${feed.stale ? " (offline)" : ""}.</div>`;
+    return;
+  }
+  grid.innerHTML = items.map(it => {
+    const thumb = it.image
+      ? `style="background-image:url('${esc(it.image)}')"`
+      : `style="background:linear-gradient(135deg,#161b27,#0a0d14)"`;
+    return `<a class="news-card" href="${esc(it.link)}" target="_blank" rel="noopener">
+      <div class="news-thumb" ${thumb}><span class="src">${esc(it.source || "News")}</span></div>
+      <div class="news-body">
+        <h4>${esc(it.title)}</h4>
+        <p>${esc(it.summary || "")}</p>
+        <div class="when">${timeAgo(it.date)}</div>
+      </div></a>`;
+  }).join("");
+}
+
+/* ---------- links ---------- */
+function renderLinks() {
+  const links = (BUNDLE.config && BUNDLE.config.links) || [];
+  $("#linksRow").innerHTML = links.map(l =>
+    `<a class="lnk" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
+}
+
+/* ---------- Joseph's 2026 season (personal race schedule) ---------- */
+function renderMyRaces() {
+  const races = (BUNDLE.config && BUNDLE.config.races) || [];
+  const box = $("#myRaces");
+  if (!races.length) { box.innerHTML = `<div class="news-empty">No races in config.json yet.</div>`; return; }
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const t0 = today.getTime();
+  const dated = races.map(r => ({ ...r, ts: Date.parse(r.date + "T12:00:00") }))
+    .sort((a, b) => a.ts - b.ts);
+  const nextIdx = dated.findIndex(r => r.ts >= t0);
+
+  box.innerHTML = dated.map((r, i) => {
+    const d = new Date(r.ts);
+    const past = r.ts < t0;
+    const isNext = i === nextIdx;
+    const dayN = Math.round((r.ts - t0) / 864e5);
+    let stat;
+    if (past) stat = "âœ“ done";
+    else if (isNext) stat = `<span class="nx-badge">next Â· ${dayN === 0 ? "today" : "in " + dayN + "d"}</span>`;
+    else stat = "in " + dayN + " days";
+    const when = r.dateLabel
+      ? `<b>${esc(r.dateLabel.replace(/^\w+ /, ""))}</b><span>${esc(r.dateLabel.split(" ")[0])}</span>`
+      : `<b>${d.toLocaleDateString([], { day: "numeric" })} ${d.toLocaleDateString([], { month: "short" })}</b><span>${d.toLocaleDateString([], { weekday: "short" })}</span>`;
+    return `<div class="race-row ${past ? "past" : ""} ${isNext ? "next" : ""}">
+      <div class="race-when">${when}</div>
+      <div class="race-info"><div class="rn">${esc(r.name)} <span class="task-tag">${esc(r.seriesTag || "")}</span></div>
+        <div class="rt">${esc(r.track || "")}</div></div>
+      <div class="race-stat">${stat}</div>
+    </div>`;
+  }).join("");
+
+  const done = dated.filter(r => r.ts < t0).length;
+  $("#myRacesCap").textContent =
+    `${done} of ${dated.length} rounds complete Â· source: ${(BUNDLE.config && BUNDLE.config.racesSource) || "config.json"} Â· edit data/config.json`;
+}
+
+/* ---------- Sponsor Pipeline (live from the Racing Contacts sheet) ---------- */
+function renderOutreach() {
+  const o = BUNDLE.outreach;
+  const box = $("#sponsorBox");
+  if (!o || !o.totals) {
+    box.innerHTML = `<div class="news-empty">No outreach data yet â€” run outreach_stats.py.</div>`;
+    return;
+  }
+  const t = o.totals;
+  const pct = t.emailable ? Math.round(t.drafted / t.emailable * 100) : 0;
+  const ms = o.byMotorsport || {};
+  const chips = (arr) => (arr && arr.length)
+    ? arr.map(x => `<span class="spon-chip">${esc(x)}</span>`).join("")
+    : `<span class="spon-chip muted">â€”</span>`;
+  const tierChips = (o.byTier || []).map(x =>
+    `<span class="spon-chip"><b>${x.count}</b> ${esc(x.name)}</span>`).join("");
+  const today = o.today || [];
+  const shown = today.slice(0, 8);
+  const more = today.length - shown.length;
+  box.innerHTML =
+    `<div class="spon-stats">
+       <div class="spon-stat"><b>${t.prospects}</b><label>prospects</label></div>
+       <div class="spon-stat"><b>${t.emailable}</b><label>emailable</label></div>
+       <div class="spon-stat hot"><b>${t.drafted}</b><label>drafted</label></div>
+       <div class="spon-stat"><b>${t.remaining}</b><label>to go</label></div>
+       <div class="spon-stat"><b>${t.forms}</b><label>forms</label></div>
+     </div>
+     <div class="spon-bar"><div class="spon-bar-fill" style="width:${pct}%"></div>
+       <span class="spon-bar-tx">${t.drafted} / ${t.emailable} emailable drafted</span></div>
+     <div class="spon-rows">
+       <div class="spon-line"><span class="spon-k">By tier</span><div class="spon-vals">${tierChips}</div></div>
+       <div class="spon-line"><span class="spon-k">Motorsport</span><div class="spon-vals">
+         <span class="spon-chip">ðŸ <b>${ms.established || 0}</b> established</span>
+         <span class="spon-chip new">ðŸš€ <b>${ms.new || 0}</b> new to the sport</span></div></div>
+       <div class="spon-line"><span class="spon-k">âœ… Drafted today</span><div class="spon-vals">${chips(shown)}${more > 0 ? `<span class="spon-chip muted">+${more}</span>` : ""}</div></div>
+       <div class="spon-line"><span class="spon-k">â­ Next up</span><div class="spon-vals">${chips(o.nextUp)}</div></div>
+     </div>
+     <div class="spon-foot">
+       <a href="${esc(o.sheetUrl || "#")}" target="_blank" rel="noopener">Open tracker â†—</a>
+       <a href="${esc(o.draftsUrl || "#")}" target="_blank" rel="noopener">Review drafts in Gmail â†—</a>
+       <span class="spon-when">updated ${esc((o.generatedAt || "").replace("T", " ").slice(0, 16))}</span>
+     </div>`;
+}
+
+/* ---------- Daily Grid (recurring to-dos) ---------- */
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function loadDaily() {
+  try { return JSON.parse(localStorage.getItem("enzo.daily") || "{}"); }
+  catch { return {}; }
+}
+function saveDaily(s) { localStorage.setItem("enzo.daily", JSON.stringify(s)); }
+
+function renderDailyGrid() {
+  const cfg = (BUNDLE.config && BUNDLE.config.dailyTasks) || {};
+  const tasks = cfg.tasks || [];
+  $("#dailyTitle").textContent = "âœ… " + (cfg.title || "Daily Grid");
+  $("#dailySub").textContent = cfg.subtitle || "";
+  const grid = $("#dailyGrid");
+  if (!tasks.length) { grid.innerHTML = `<div class="news-empty">Add tasks under "dailyTasks" in config.json.</div>`; return; }
+
+  const state = loadDaily();
+  const today = todayKey();
+  if (state.day !== today) { state.day = today; state.checked = {}; saveDaily(state); }
+  const checked = state.checked || {};
+
+  grid.innerHTML = tasks.map(t => {
+    const on = !!checked[t.id];
+    const links = (t.links || []).map(l =>
+      `<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label)} â†—</a>`).join("");
+    return `<div class="task-card ${on ? "done" : ""}" data-id="${esc(t.id)}">
+      <div class="task-check"></div>
+      <div class="task-ico">${esc(t.icon || "â€¢")}</div>
+      <div class="task-main">
+        <div class="task-top"><span class="task-title">${esc(t.title)}</span>${t.tag ? `<span class="task-tag">${esc(t.tag)}</span>` : ""}</div>
+        <p class="task-desc">${esc(t.desc || "")}</p>
+        ${links ? `<div class="task-links">${links}</div>` : ""}
+      </div></div>`;
+  }).join("");
+
+  $$("#dailyGrid .task-card").forEach(card => {
+    card.addEventListener("click", () => toggleTask(card.dataset.id, card));
+  });
+  $("#dailyReset").onclick = () => {
+    const s = loadDaily(); s.checked = {}; s.day = todayKey(); saveDaily(s);
+    renderDailyGrid();
+  };
+  updateDailyProgress(tasks);
+}
+
+function toggleTask(id, card) {
+  const state = loadDaily();
+  state.day = todayKey();
+  state.checked = state.checked || {};
+  state.checked[id] = !state.checked[id];
+  saveDaily(state);
+  card.classList.toggle("done", state.checked[id]);
+  const tasks = (BUNDLE.config.dailyTasks || {}).tasks || [];
+  updateDailyProgress(tasks);
+  if (state.checked[id]) burstConfetti(card);
+}
+
+function updateDailyProgress(tasks) {
+  const checked = (loadDaily().checked) || {};
+  const done = tasks.filter(t => checked[t.id]).length;
+  const total = tasks.length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  $("#dailyBar").style.width = pct + "%";
+  $("#dailyCount").textContent = `${done}/${total} done`;
+
+  const cel = $("#dailyCelebrate");
+  const complete = total > 0 && done === total;
+  if (complete && !cel.classList.contains("show")) {
+    cel.classList.add("show", "pop");
+    setTimeout(() => cel.classList.remove("pop"), 650);
+    bumpStreak();
+    bigConfetti();
+  } else if (!complete && cel.classList.contains("show")) {
+    cel.classList.remove("show");
+    unbumpStreak();
+  }
+  renderStreak();
+}
+
+/* streak: increments the first time a day is completed; the completion day is
+   stored so re-renders don't double-count. */
+function bumpStreak() {
+  const s = loadDaily();
+  if (s.completedOn === todayKey()) return;
+  const streak = JSON.parse(localStorage.getItem("enzo.streak") || "{}");
+  const y = new Date(Date.now() - 864e5);
+  const yKey = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, "0")}-${String(y.getDate()).padStart(2, "0")}`;
+  streak.count = (streak.lastDay === yKey) ? (streak.count || 0) + 1 : 1;
+  streak.lastDay = todayKey();
+  if (!streak.best || streak.count > streak.best) streak.best = streak.count;
+  localStorage.setItem("enzo.streak", JSON.stringify(streak));
+  s.completedOn = todayKey(); saveDaily(s);
+}
+function unbumpStreak() {
+  const s = loadDaily();
+  if (s.completedOn !== todayKey()) return;
+  const streak = JSON.parse(localStorage.getItem("enzo.streak") || "{}");
+  streak.count = Math.max(0, (streak.count || 1) - 1);
+  if (streak.count === 0) streak.lastDay = "";
+  localStorage.setItem("enzo.streak", JSON.stringify(streak));
+  delete s.completedOn; saveDaily(s);
+}
+function renderStreak() {
+  const streak = JSON.parse(localStorage.getItem("enzo.streak") || "{}");
+  const n = streak.count || 0;
+  const el = $("#dailyStreak");
+  el.innerHTML = `ðŸ”¥ <b>${n}</b> day${n === 1 ? "" : "s"}` + (streak.best ? ` Â· best ${streak.best}` : "");
+}
+
+function burstConfetti(card) {
+  const wrap = document.createElement("div");
+  wrap.className = "confetti";
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement("span");
+    s.style.left = Math.random() * 100 + "%";
+    s.style.setProperty("--i", i);
+    s.style.setProperty("--h", Math.floor(Math.random() * 360));
+    wrap.appendChild(s);
+  }
+  card.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 2200);
+}
+function bigConfetti() {
+  const cel = $("#dailyCelebrate");
+  const wrap = document.createElement("div");
+  wrap.className = "confetti";
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement("span");
+    s.style.left = Math.random() * 100 + "%";
+    s.style.setProperty("--i", i);
+    s.style.setProperty("--h", Math.floor(Math.random() * 360));
+    wrap.appendChild(s);
+  }
+  cel.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 2400);
+}
+
+/* ---------- clock + utils ---------- */
+function tickClock() {
+  const now = new Date();
+  $("#clock-time").textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  $("#clock-date").textContent = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
+}
+function set(sel, v) { const el = $(sel); if (el) el.textContent = v; }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function timeAgo(str) {
+  const t = Date.parse(str);
+  if (!isFinite(t)) return str || "";
+  const diff = (Date.now() - t) / 1000;
+  if (diff < 3600) return Math.max(1, Math.round(diff / 60)) + " min ago";
+  if (diff < 86400) return Math.round(diff / 3600) + " hr ago";
+  return Math.round(diff / 86400) + " d ago";
+}
+

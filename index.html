@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOSHI #81 — Morning Race Brief · Saddington Racing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+  .sponsor-card{padding:18px 20px}
+  .spon-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+  .spon-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 10px;text-align:center}
+  .spon-stat b{display:block;font-family:'Orbitron',sans-serif;font-size:1.7rem;line-height:1;color:#f0f0ee}
+  .spon-stat label{display:block;margin-top:6px;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:#9d978c}
+  .spon-stat.hot b{color:#f7931a}
+  .spon-bar{position:relative;height:22px;background:rgba(255,255,255,.05);border-radius:11px;overflow:hidden;margin-bottom:16px}
+  .spon-bar-fill{height:100%;background:linear-gradient(90deg,#f7931a,#ffb84d);border-radius:11px;transition:width .6s}
+  .spon-bar-tx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .spon-rows{display:flex;flex-direction:column;gap:10px}
+  .spon-line{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .spon-k{flex:0 0 120px;font-size:.78rem;font-weight:600;color:#c9c3b8;padding-top:4px}
+  .spon-vals{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+  .spon-chip{background:rgba(247,147,26,.1);border:1px solid rgba(247,147,26,.25);color:#f0d9b8;border-radius:999px;padding:4px 10px;font-size:.78rem;white-space:nowrap}
+  .spon-chip b{color:#f7931a}
+  .spon-chip.new{background:rgba(61,139,255,.1);border-color:rgba(61,139,255,.3);color:#cfe0ff}
+  .spon-chip.new b{color:#5aa0ff}
+  .spon-chip.muted{opacity:.55}
+  .spon-foot{display:flex;gap:16px;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);font-size:.8rem;flex-wrap:wrap}
+  .spon-foot a{color:#f7931a;text-decoration:none}
+  .spon-foot a:hover{text-decoration:underline}
+  .spon-when{margin-left:auto;color:#75706a;font-size:.72rem}
+  @media(max-width:680px){.spon-stats{grid-template-columns:repeat(2,1fr)}.spon-k{flex-basis:100%}}
+  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23f7931a'/%3E%3Ctext x='50' y='73' font-size='62' font-weight='bold' text-anchor='middle' fill='%23000' font-family='Arial'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">₿</span>
+      <div class="brand-text">
+        <strong>BITCOIN<span> RACING</span></strong>
+        <small>Joseph "TOSHI #81" · morning brief</small>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="clock">
+        <span id="clock-time">--:--</span>
+        <small id="clock-date">—</small>
+      </div>
+      <button id="refreshBtn" class="refresh" title="Refresh data">
+        <span class="refresh-ico">↻</span> Refresh
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-left">
+      <p class="kicker"><span class="live-dot"></span> <span id="greetTime">Good morning</span></p>
+      <h1 id="greetName">Welcome back, racer</h1>
+      <p class="hero-tag" id="tagline">Lights out and away we go</p>
+      <div class="hero-chips" id="favChips"></div>
+      <div class="driver-badge" id="driverBadge" style="display:none"></div>
+    </div>
+    <div class="hero-next" id="heroNext">
+      <div class="hero-next-label">NEXT LIGHTS OUT</div>
+      <div class="hero-next-series" id="heroSeries">—</div>
+      <div class="hero-next-name" id="heroRace">Loading schedule…</div>
+      <div class="hero-countdown" id="heroCountdown">
+        <div class="cd-box"><span id="cd-d">--</span><label>days</label></div>
+        <div class="cd-box"><span id="cd-h">--</span><label>hrs</label></div>
+        <div class="cd-box"><span id="cd-m">--</span><label>min</label></div>
+        <div class="cd-box"><span id="cd-s">--</span><label>sec</label></div>
+      </div>
+      <div class="hero-next-meta" id="heroMeta">—</div>
+    </div>
+  </section>
+
+  <div class="news-head">
+    <h2 class="section-title">📰 Latest from Motorsport.com</h2>
+    <div class="seg" id="newsTabs"></div>
+  </div>
+  <section class="news-grid" id="newsGrid"></section>
+
+  <h2 class="section-title">⏱ Next Round · Every Series</h2>
+  <section class="countdown-strip" id="countdownStrip"></section>
+
+  <main class="grid">
+    <section class="card card-wide">
+      <div class="card-head">
+        <h3>📊 Championship · Points</h3>
+        <div class="seg" id="chartTabs"></div>
+      </div>
+      <div class="chart-wrap"><canvas id="pointsChart"></canvas></div>
+      <div class="legend" id="chartLegend"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h3 id="standTitle">🏆 Standings</h3>
+        <span class="src-badge manual" id="standSrc">manual</span>
+      </div>
+      <div class="standings" id="standingsTable"></div>
+    </section>
+
+    <section class="card hq-card">
+      <div class="card-head"><h3>🏁 Team HQ · TOSHI <span class="btc-mark">#81</span></h3>
+        <span class="badge">Saddington Racing</span></div>
+      <div id="hqBox">Loading…</div>
+    </section>
+
+    <section class="card nascar-card">
+      <div class="card-head"><h3>🇺🇸 NASCAR Cup · Live Feed</h3>
+        <span class="badge" id="nascarBadge">live</span></div>
+      <div id="nascarBox" class="nascar-box">Loading…</div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h3>🗓️ Season Progress</h3></div>
+      <div class="chart-wrap small"><canvas id="progressChart"></canvas></div>
+    </section>
+  </main>
+
+  <h2 class="section-title">🔗 Quick Links</h2>
+  <section class="links-row" id="linksRow"></section>
+
+  <!-- JOSEPH'S 2026 SEASON -->
+  <h2 class="section-title">🏁 Joseph's 2026 Season</h2>
+  <section class="card race-card">
+    <div class="race-list" id="myRaces">Loading…</div>
+    <div class="race-cap" id="myRacesCap"></div>
+  </section>
+
+  <!-- SPONSOR PIPELINE -->
+  <h2 class="section-title">🤝 Sponsor Pipeline · Saddington Racing</h2>
+  <section class="card sponsor-card">
+    <div id="sponsorBox">Loading…</div>
+  </section>
+
+  <!-- DAILY GRID -->
+  <div class="personal-head">
+    <div>
+      <h2 class="section-title" id="dailyTitle">✅ Daily Grid</h2>
+      <p class="personal-sub" id="dailySub"></p>
+    </div>
+    <div class="daily-meta">
+      <span class="daily-streak" id="dailyStreak">🔥 <b>0</b> day streak</span>
+      <button class="daily-reset" id="dailyReset">reset today</button>
+    </div>
+  </div>
+  <div class="daily-progress">
+    <div class="daily-track"><div class="daily-bar" id="dailyBar"></div></div>
+    <span id="dailyCount">0/0 done</span>
+  </div>
+  <div class="daily-celebrate" id="dailyCelebrate"><span class="flag">🏁</span> <span>Perfect day — every task done. Streak extended. Now go faster tomorrow.</span></div>
+  <section class="daily-grid" id="dailyGrid"></section>
+
+  <footer class="foot">
+    <span id="footStamp">—</span>
+    <span>Built by <strong>Enzo</strong> for Joseph <strong class="btc-mark">TOSHI #81</strong> Saddington · <strong>Saddington Racing</strong> · NASCAR &amp; IndyCar standings live via ESPN · news via Motorsport.com</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

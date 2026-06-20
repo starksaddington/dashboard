@@ -2,3 +2,5 @@
 [build]
   publish = "."
   command = ""
+
+# trigger git deploy

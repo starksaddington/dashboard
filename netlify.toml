@@ -1,6 +1,2 @@
-# Static site — no build step. Serve the repo root as-is.
-[build]
+﻿[build]
   publish = "."
-  command = ""
-
-# trigger git deploy

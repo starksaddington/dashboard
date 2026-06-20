@@ -35,6 +35,7 @@ def main():
         "news": news,
         "nascar": server.get_nascar("1"),
         "outreach": outreach,
+        "sponsors": server.load_json_file("sponsors.json", {}),
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
 

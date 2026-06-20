@@ -1,0 +1,11 @@
+{
+  "goal": 100000,
+  "source": "saddingtonracing.com (Wen Moon / HODL counts) + confirmed deals (Satoshi / Paddock)",
+  "tiers": [
+    { "name": "Satoshi Club", "amount": 5000, "count": 2, "color": "#f7931a" },
+    { "name": "Paddock Pass", "amount": 2000, "count": 2, "color": "#3d8bff" },
+    { "name": "Wen Moon Club", "amount": 500, "count": 20, "color": "#c06bff" },
+    { "name": "HODL Club", "amount": 150, "count": 61, "color": "#2bd47a" }
+  ],
+  "_notes": "Editable sponsorship ledger for the dashboard 'Sponsorship Secured' section. amount = tier price, count = backers in that tier. Wen Moon/HODL counts are published on saddingtonracing.com; Satoshi/Paddock confirmed by Peter. Update counts as new deals close."
+}

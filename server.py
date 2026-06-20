@@ -419,6 +419,7 @@ class Handler(BaseHTTPRequestHandler):
                 "news": news,
                 "nascar": get_nascar("1"),
                 "outreach": load_json_file("outreach.json", {}),
+                "sponsors": load_json_file("sponsors.json", {}),
                 "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
             })
         return self._send_json({"ok": False, "error": "unknown endpoint"}, 404)

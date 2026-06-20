@@ -59,6 +59,7 @@ function renderAll() {
   renderLinks();
   renderMyRaces();
   renderOutreach();
+  renderSponsors();
   renderDailyGrid();
   $("#footStamp").textContent =
     "Updated " + new Date().toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
@@ -541,6 +542,68 @@ function renderOutreach() {
     data: { labels: tier.map(x => x.name), datasets: [{ data: tier.map(x => x.count), backgroundColor: ["#f7931a", "#3d8bff", "#2bd47a", "#c06bff"], borderWidth: 0 }] },
     options: donutOpts(),
   });
+}
+
+/* ---------- Sponsorship Secured ---------- */
+function renderSponsors() {
+  const s = BUNDLE.sponsors;
+  const box = $("#sponsorsBox");
+  if (!box) return;
+  if (!s || !s.tiers || !s.tiers.length) {
+    box.innerHTML = `<div class="news-empty">No sponsorship data yet — edit data/sponsors.json.</div>`;
+    return;
+  }
+  const fmt = n => "$" + Math.round(n).toLocaleString();
+  const tiers = s.tiers.map(t => ({ ...t, revenue: (t.amount || 0) * (t.count || 0) }));
+  const raised = tiers.reduce((a, t) => a + t.revenue, 0);
+  const backers = tiers.reduce((a, t) => a + (t.count || 0), 0);
+  const active = tiers.filter(t => t.count > 0).length;
+  const avg = backers ? Math.round(raised / backers) : 0;
+  const goal = s.goal || 0;
+  const goalPct = goal ? Math.min(100, Math.round(raised / goal * 100)) : 0;
+  const maxRev = Math.max(1, ...tiers.map(t => t.revenue));
+
+  const tierBars = tiers.map(t =>
+    `<div class="spx-bar">
+       <div class="spx-bar-head"><span>${esc(t.name)}</span><b>${fmt(t.revenue)}</b></div>
+       <div class="spx-track"><div class="spx-fill" style="width:${Math.round(t.revenue / maxRev * 100)}%;background:${esc(t.color || "#f7931a")}"></div></div>
+       <div class="spx-sub">${t.count} × ${fmt(t.amount)}</div>
+     </div>`).join("");
+
+  const o = BUNDLE.outreach && BUNDLE.outreach.totals;
+  let funnel = `<div class="news-empty">—</div>`;
+  if (o) {
+    const stages = [
+      { k: "Prospects identified", v: o.prospects || 0 },
+      { k: "Reachable (emailable)", v: o.emailable || 0 },
+      { k: "Backers secured", v: backers },
+    ];
+    const top = stages[0].v || 1;
+    funnel = `<div class="spx-funnel">` + stages.map((st, i) => {
+      const w = Math.max(8, Math.round(st.v / top * 100));
+      const conv = i > 0 && stages[i - 1].v ? Math.round(st.v / stages[i - 1].v * 100) : null;
+      return `<div class="spx-fn-row">
+        <div class="spx-fn-bar" style="width:${w}%">${st.v.toLocaleString()}</div>
+        <div class="spx-fn-lbl">${esc(st.k)}${conv != null ? ` <em>${conv}%</em>` : ""}</div></div>`;
+    }).join("") + `</div>`;
+  }
+
+  box.innerHTML =
+    `<div class="spx-kpis">
+       <div class="spx-kpi hot"><b>${fmt(raised)}</b><label>raised</label></div>
+       <div class="spx-kpi"><b>${backers}</b><label>backers</label></div>
+       <div class="spx-kpi"><b>${active}</b><label>active tiers</label></div>
+       <div class="spx-kpi"><b>${fmt(avg)}</b><label>avg / backer</label></div>
+     </div>
+     ${goal ? `<div class="spx-goal">
+       <div class="spx-goal-head"><span>🎯 Season goal</span><b>${fmt(raised)} / ${fmt(goal)} · ${goalPct}%</b></div>
+       <div class="spx-track big"><div class="spx-fill" style="width:${goalPct}%;background:linear-gradient(90deg,#f7931a,#ffb84d)"></div></div>
+     </div>` : ""}
+     <div class="spx-cols">
+       <div><div class="spx-h">Revenue by tier</div>${tierBars}</div>
+       <div><div class="spx-h">Sponsorship funnel</div>${funnel}</div>
+     </div>
+     ${s.source ? `<div class="spx-src">source: ${esc(s.source)}</div>` : ""}`;
 }
 
 /* ---------- Daily Grid (recurring to-dos) ---------- */

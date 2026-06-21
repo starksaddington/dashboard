@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-21T16:19:05",
+  "generatedAt": "2026-06-21T17:34:03",
   "totals": {
     "prospects": 2534,
     "emailable": 1307,
     "drafted": 0,
-    "sent": 524,
-    "remaining": 762,
+    "sent": 532,
+    "remaining": 754,
     "forms": 1002,
     "social": 225
   },
@@ -71,7 +71,12 @@
   "sentLog": [
     {
       "date": "2026-06-21",
-      "total": 524
+      "total": 532
     }
-  ]
+  ],
+  "health": {
+    "bounced": 10,
+    "declined": 5,
+    "dailyCap": 75
+  }
 }

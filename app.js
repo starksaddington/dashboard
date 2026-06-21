@@ -550,8 +550,12 @@ function renderOutreach() {
   const t = o.totals;
   const sent = t.sent != null ? t.sent : t.drafted;
   const pct = t.emailable ? Math.round(sent / t.emailable * 100) : 0;
-  const emRate = t.prospects ? Math.round(t.emailable / t.prospects * 100) : 0;
-  const formRate = t.prospects ? Math.round(t.forms / t.prospects * 100) : 0;
+  const h = o.health || {};
+  const bounced = h.bounced || 0, declined = h.declined || 0;
+  const contacted = sent + bounced + declined;
+  const touchedPct = t.prospects ? Math.round(contacted / t.prospects * 100) : 0;
+  const cap = h.dailyCap || null;
+  const runway = (cap && t.remaining) ? Math.round(t.remaining / cap) : null;
   const ms = o.byMotorsport || {};
   const chips = (arr) => (arr && arr.length)
     ? arr.map(x => `<span class="spon-chip">${esc(x)}</span>`).join("")
@@ -613,11 +617,13 @@ function renderOutreach() {
        <div class="spon-stat"><b>${t.remaining}</b><label>to go</label></div>
        <div class="spon-stat"><b>${t.forms}</b><label>forms</label></div>
      </div>
-     <div class="spon-pct">
-       <span class="p"><b>${emRate}%</b> emailable</span>
-       <span class="p"><b>${pct}%</b> of emailable contacted</span>
-       <span class="p"><b>${formRate}%</b> form-only</span>
+     <div class="health">
+       <div class="hp"><b>${touchedPct}%</b><label>list touched</label></div>
+       <div class="hp"><b>${pct}%</b><label>of emailable</label></div>
+       ${runway != null ? `<div class="hp"><b>~${runway}d</b><label>runway @ ${cap}/day</label></div>` : ""}
+       <div class="hp"><b>${(t.forms || 0).toLocaleString()}</b><label>form reserve</label></div>
      </div>
+     <div class="health-note">📨 ${contacted.toLocaleString()} contacted · ⚠️ ${bounced} bounced · 🚫 ${declined} declined</div>
      ${funnelHtml}
      ${sparkHtml}
      <div class="spon-charts">

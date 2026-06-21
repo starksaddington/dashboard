@@ -477,7 +477,8 @@ function renderOutreach() {
     return;
   }
   const t = o.totals;
-  const pct = t.emailable ? Math.round(t.drafted / t.emailable * 100) : 0;
+  const sent = t.sent != null ? t.sent : t.drafted;
+  const pct = t.emailable ? Math.round(sent / t.emailable * 100) : 0;
   const emRate = t.prospects ? Math.round(t.emailable / t.prospects * 100) : 0;
   const formRate = t.prospects ? Math.round(t.forms / t.prospects * 100) : 0;
   const ms = o.byMotorsport || {};
@@ -494,17 +495,17 @@ function renderOutreach() {
     `<div class="spon-stats">
        <div class="spon-stat"><b>${t.prospects}</b><label>prospects</label></div>
        <div class="spon-stat"><b>${t.emailable}</b><label>emailable</label></div>
-       <div class="spon-stat hot"><b>${t.drafted}</b><label>drafted</label></div>
+       <div class="spon-stat hot"><b>${sent}</b><label>sent</label></div>
        <div class="spon-stat"><b>${t.remaining}</b><label>to go</label></div>
        <div class="spon-stat"><b>${t.forms}</b><label>forms</label></div>
      </div>
      <div class="spon-pct">
        <span class="p"><b>${emRate}%</b> emailable</span>
-       <span class="p"><b>${pct}%</b> of emailable drafted</span>
+       <span class="p"><b>${pct}%</b> of emailable contacted</span>
        <span class="p"><b>${formRate}%</b> form-only</span>
      </div>
      <div class="spon-bar"><div class="spon-bar-fill" style="width:${pct}%"></div>
-       <span class="spon-bar-tx">${t.drafted} / ${t.emailable} emailable drafted</span></div>
+       <span class="spon-bar-tx">${sent} / ${t.emailable} emailable contacted</span></div>
      <div class="spon-charts">
        <div class="spon-donut"><canvas id="sponCatChart"></canvas><span class="spon-donut-cap">Prospects by category</span></div>
        <div class="spon-donut"><canvas id="sponTierChart"></canvas><span class="spon-donut-cap">Prospects by tier</span></div>
@@ -513,7 +514,7 @@ function renderOutreach() {
        <div class="spon-line"><span class="spon-k">Motorsport</span><div class="spon-vals">
          <span class="spon-chip">🏁 <b>${ms.established || 0}</b> established</span>
          <span class="spon-chip new">🚀 <b>${ms.new || 0}</b> new to the sport</span></div></div>
-       <div class="spon-line"><span class="spon-k">✅ Drafted today</span><div class="spon-vals">${chips(shown)}${more > 0 ? `<span class="spon-chip muted">+${more}</span>` : ""}</div></div>
+       <div class="spon-line"><span class="spon-k">✅ Sent today</span><div class="spon-vals">${chips(shown)}${more > 0 ? `<span class="spon-chip muted">+${more}</span>` : ""}</div></div>
        <div class="spon-line"><span class="spon-k">⏭ Next up</span><div class="spon-vals">${chips(o.nextUp)}</div></div>
      </div>
      ${(foot.length || o.generatedAt) ? `<div class="spon-foot">${foot.join("")}

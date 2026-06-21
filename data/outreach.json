@@ -1,12 +1,13 @@
 {
-  "generatedAt": "2026-06-20T12:55:24",
+  "generatedAt": "2026-06-21T15:46:21",
   "totals": {
     "prospects": 2534,
-    "emailable": 1278,
+    "emailable": 1282,
     "drafted": 0,
-    "remaining": 822,
-    "forms": 1028,
-    "social": 228
+    "sent": 521,
+    "remaining": 740,
+    "forms": 1026,
+    "social": 226
   },
   "byTier": [
     {
@@ -63,8 +64,8 @@
   ],
   "today": [],
   "nextUp": [
-    "Stamp Seed",
-    "CryptoCloaks",
-    "Altair Technology"
+    "Bitci.com",
+    "JMRacing",
+    "Race Spec"
   ]
 }

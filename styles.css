@@ -115,8 +115,9 @@ h1,h2,h3,.clock span,.cd-box span,.kicker{font-family:'Bai Jamjuree','Rajdhani',
 .hero-next-meta{margin-top:14px;color:var(--mut);font-size:13px;position:relative}
 
 /* section titles */
-.section-title{font-size:22px;font-weight:800;letter-spacing:.01em;margin:14px 2px 16px;display:flex;align-items:center;gap:9px;position:relative;padding-left:14px}
-.section-title::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:5px;height:1.05em;border-radius:3px;background:linear-gradient(180deg,#f7931a,#ffb84d);box-shadow:0 0 10px rgba(247,147,26,.55)}
+.section-title{font-size:23px;font-weight:800;letter-spacing:.01em;margin:30px 2px 15px;display:flex;align-items:center;gap:10px;position:relative;padding-left:15px}
+.section-title::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:5px;height:1.1em;border-radius:3px;background:linear-gradient(180deg,#f7931a,#ffb84d);box-shadow:0 0 10px rgba(247,147,26,.55)}
+.section-title::after{content:"";flex:1;height:1px;margin-left:6px;background:linear-gradient(90deg,rgba(247,147,26,.35),transparent)}
 
 /* countdown strip */
 .countdown-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:32px}
@@ -185,8 +186,9 @@ h1,h2,h3,.clock span,.cd-box span,.kicker{font-family:'Bai Jamjuree','Rajdhani',
 .nascar-box .nlast b{color:var(--txt)}
 
 /* news */
-.news-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px}
-.news-head .section-title{margin-bottom:8px}
+.news-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:30px}
+.news-head .section-title{margin:0 0 8px}
+.news-head .section-title::after{display:none}
 .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin:14px 0 34px}
 .news-card{
   background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;
@@ -270,7 +272,9 @@ h1,h2,h3,.clock span,.cd-box span,.kicker{font-family:'Bai Jamjuree','Rajdhani',
 .nx-badge{background:var(--btc);color:#1a1205;font-weight:800;font-size:11px;padding:4px 11px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
 
 /* ===== Daily Grid (to-dos) ===== */
-.personal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px}
+.personal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:30px}
+.personal-head .section-title{margin:0 0 4px}
+.personal-head .section-title::after{display:none}
 .personal-sub{color:var(--mut);font-size:13.5px;margin:-10px 2px 0;max-width:60ch}
 .daily-meta{display:flex;align-items:center;gap:10px}
 .daily-streak{background:rgba(247,147,26,.12);border:1px solid rgba(247,147,26,.32);color:var(--btc);font-weight:700;font-size:14px;padding:8px 15px;border-radius:30px;white-space:nowrap}

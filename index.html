@@ -49,6 +49,12 @@
   .fnl-conv{font-size:.68rem;color:#9d978c;padding:6px 0;letter-spacing:.03em}
   .fnl-conv b{color:#2bd47a;font-family:'Orbitron',sans-serif;font-size:.78rem}
   .pop-num{transition:color .2s}
+  /* hero business numbers */
+  .biz-strip{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .biz{background:rgba(255,255,255,.04);border:1px solid rgba(247,147,26,.2);border-radius:13px;padding:11px 17px;text-align:center;min-width:94px}
+  .biz b{display:block;font-family:'Orbitron',sans-serif;font-size:1.32rem;color:#f0f0ee;line-height:1}
+  .biz.hot b{color:#f7931a}
+  .biz label{display:block;margin-top:6px;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:#9d978c}
   /* momentum sparkline */
   .spark{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;margin:0 0 16px}
   .spark-h{display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:#c9c3b8;margin-bottom:6px}
@@ -136,8 +142,7 @@
       <p class="kicker"><span class="live-dot"></span> <span id="greetTime">Good morning</span></p>
       <h1 id="greetName">Welcome back, racer</h1>
       <p class="hero-tag" id="tagline">Lights out and away we go</p>
-      <div class="hero-chips" id="favChips"></div>
-      <div class="driver-badge" id="driverBadge" style="display:none"></div>
+      <div class="biz-strip" id="bizStrip"></div>
     </div>
     <div class="hero-next" id="heroNext">
       <div class="hero-next-label">NEXT LIGHTS OUT</div>
@@ -153,13 +158,23 @@
     </div>
   </section>
 
+  <!-- THE DRIVER -->
+  <h2 class="section-title">🏎️ The Driver</h2>
+  <section class="card hq-card card-wide">
+    <div class="card-head"><h3>🏁 TOSHI <span class="btc-mark">#81</span> · Pro Spec Miata</h3>
+      <span class="badge">Joseph Saddington · Saddington Racing</span></div>
+    <div id="hqBox">Loading…</div>
+  </section>
+
+  <!-- NEWS -->
   <div class="news-head">
     <h2 class="section-title">📰 Latest from RACER &amp; Motorsport.com</h2>
     <div class="seg" id="newsTabs"></div>
   </div>
   <section class="news-grid" id="newsGrid"></section>
 
-  <h2 class="section-title">⏱ Next Round · Every Series</h2>
+  <!-- SERIES UPDATES -->
+  <h2 class="section-title">🏆 Series Updates</h2>
   <section class="countdown-strip" id="countdownStrip"></section>
 
   <main class="grid">
@@ -180,12 +195,6 @@
       <div class="standings" id="standingsTable"></div>
     </section>
 
-    <section class="card hq-card">
-      <div class="card-head"><h3>🏁 Team HQ · TOSHI <span class="btc-mark">#81</span></h3>
-        <span class="badge">Saddington Racing</span></div>
-      <div id="hqBox">Loading…</div>
-    </section>
-
     <section class="card nascar-card">
       <div class="card-head"><h3>🇺🇸 NASCAR Cup · Live Feed</h3>
         <span class="badge" id="nascarBadge">live</span></div>
@@ -197,12 +206,6 @@
       <div class="chart-wrap small"><canvas id="progressChart"></canvas></div>
     </section>
   </main>
-
-  <h2 class="section-title">🔗 Quick Links</h2>
-  <section class="links-row" id="linksRow"></section>
-
-  <!-- SADDINGTON STATUS BAR -->
-  <section class="status-bar" id="sponHero"></section>
 
   <!-- JOSEPH'S 2026 SEASON -->
   <h2 class="section-title">🏁 Joseph's 2026 Season</h2>
@@ -240,6 +243,10 @@
   </div>
   <div class="daily-celebrate" id="dailyCelebrate"><span class="flag">🏁</span> <span>Perfect day — every task done. Streak extended. Now go faster tomorrow.</span></div>
   <section class="daily-grid" id="dailyGrid"></section>
+
+  <!-- QUICK LINKS -->
+  <h2 class="section-title">🔗 Quick Links</h2>
+  <section class="links-row" id="linksRow"></section>
 
   <footer class="foot">
     <span id="footStamp">—</span>

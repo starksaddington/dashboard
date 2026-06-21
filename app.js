@@ -23,7 +23,6 @@ let sponCatChart = null, sponTierChart = null;
 let countdownTargets = [];   // [{el, ts}] for the strip
 let heroTarget = null;       // ms
 let nascarTarget = null;     // ms
-let sponRaceTarget = null;   // ms — Joseph's next race, for the status bar
 
 document.addEventListener("DOMContentLoaded", () => {
   tickClock();
@@ -50,8 +49,9 @@ async function load(isRefresh) {
 
 function renderAll() {
   renderGreeting();
+  renderBizStrip();
   const events = buildEvents();
-  renderHero(events);
+  renderHero();
   renderStrip(events);
   renderChartTabs();
   renderProgress();
@@ -59,7 +59,6 @@ function renderAll() {
   renderNewsTabs();
   renderLinks();
   renderMyRaces();
-  renderSponHero();
   renderOutreach();
   renderSponsors();
   renderDailyGrid();
@@ -77,26 +76,21 @@ function renderGreeting() {
   $("#greetName").textContent = name ? `${phase}, ${name}` : "Welcome back, racer";
   if (cfg.tagline) $("#tagline").textContent = cfg.tagline;
 
-  const chips = [];
-  (cfg.favoriteDrivers || []).slice(0, 4).forEach(d => chips.push(`<span class="chip"><i>●</i>${esc(d)}</span>`));
-  (cfg.favoriteTeams || []).slice(0, 2).forEach(t => chips.push(`<span class="chip"><i>▰</i>${esc(t)}</span>`));
-  $("#favChips").innerHTML = chips.join("");
+}
 
-  const dr = cfg.driver;
-  const badge = $("#driverBadge");
-  if (dr) {
-    badge.style.display = "flex";
-    badge.innerHTML =
-      `<div class="num">${esc(dr.number || "")}<small>${esc(dr.carClass || "")}</small></div>
-       ${dr.kanji ? `<div class="kanji">${esc(dr.kanji)}</div>` : ""}
-       <div class="dinfo">
-         <b>${esc(dr.nickname || dr.name || "")}${dr.name ? " · " + esc(dr.name) : ""}</b>
-         <span>${esc(dr.series || "")}</span>
-         <em>${esc(dr.note || (cfg.team && cfg.team.motto) || "")}</em>
-       </div>`;
-  } else {
-    badge.style.display = "none";
-  }
+/* ---------- hero business numbers ---------- */
+function renderBizStrip() {
+  const box = $("#bizStrip");
+  if (!box) return;
+  const { raised, backers, goal } = sponTotals();
+  const goalPct = goal ? Math.round(raised / goal * 100) : 0;
+  const fmt = n => "$" + Math.round(n).toLocaleString();
+  box.innerHTML =
+    `<div class="biz hot"><b>${fmt(raised)}</b><label>raised</label></div>
+     <div class="biz"><b>${goalPct}%</b><label>to ${fmt(goal)} goal</label></div>
+     <div class="biz"><b>${backers}</b><label>backers</label></div>
+     <div class="biz"><b>${sentTotal()}</b><label>emails sent</label></div>`;
+  popCounts(box, ".biz b");
 }
 
 function renderHQ() {
@@ -154,17 +148,17 @@ function buildEvents() {
   return out.sort((a, b) => a.ts - b.ts);
 }
 
-function renderHero(events) {
-  const now = Date.now();
-  const next = events.find(e => e.ts > now) || events[0];
-  if (!next) { $("#heroRace").textContent = "No upcoming rounds scheduled."; return; }
-  const m = SERIES_META[next.series] || {};
-  $("#heroSeries").textContent = `${m.flag || "🏁"} ${next.seriesLabel}`;
-  $("#heroRace").textContent = next.name;
-  $("#heroMeta").textContent = [next.loc,
-    new Date(next.ts).toLocaleString([], { weekday: "long", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+function renderHero() {
+  // Big countdown = Joseph's OWN next race (from config.races), e.g. Daytona.
+  const nr = nextRace();
+  if (!nr) { $("#heroRace").textContent = "Season schedule TBA"; heroTarget = null; return; }
+  $("#heroSeries").textContent = `🏁 ${nr.seriesTag || "Next race"}`;
+  $("#heroRace").textContent = nr.name;
+  const d = new Date(nr.ts);
+  $("#heroMeta").textContent = [nr.track,
+    nr.dateLabel || d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" })
   ].filter(Boolean).join("  ·  ");
-  heroTarget = next.ts;
+  heroTarget = nr.ts;
 }
 
 function renderStrip(events) {
@@ -208,13 +202,6 @@ function tickCountdowns() {
   if (nascarTarget) {
     const el = $("#nascarCd");
     if (el) { const d = nascarTarget - now; el.textContent = d <= 0 ? "Race weekend!" : "in " + compact(d, true); }
-  }
-  if (sponRaceTarget) {
-    const el = $("#sbCountdown");
-    if (el) {
-      const d = sponRaceTarget - now;
-      el.innerHTML = d <= 0 ? `<b class="sb-live">🟢 RACE WEEKEND</b>` : fullCount(d);
-    }
   }
 }
 
@@ -500,32 +487,6 @@ function nextRace() {
 function sentTotal() {
   const t = (BUNDLE.outreach && BUNDLE.outreach.totals) || {};
   return t.sent != null ? t.sent : (t.drafted || 0);
-}
-
-/* ---------- status bar: next race countdown + headline KPIs ---------- */
-function renderSponHero() {
-  const box = $("#sponHero");
-  if (!box) return;
-  const { raised, backers } = sponTotals();
-  const nr = nextRace();
-  sponRaceTarget = nr ? nr.ts : null;
-  const fmt = n => "$" + Math.round(n).toLocaleString();
-  box.innerHTML =
-    `<div class="sb-race">
-       <span class="sb-flag">🏁</span>
-       <div class="sb-rwrap">
-         <span class="sb-rlabel">NEXT RACE${nr && nr.seriesTag ? " · " + esc(nr.seriesTag) : ""}</span>
-         <span class="sb-rname">${nr ? esc(nr.name) : "Schedule TBA"}</span>
-         <span class="sb-cd" id="sbCountdown">—</span>
-       </div>
-     </div>
-     <div class="sb-kpis">
-       <div class="sb-kpi hot"><b>${fmt(raised)}</b><label>raised</label></div>
-       <div class="sb-kpi"><b>${sentTotal()}</b><label>sent</label></div>
-       <div class="sb-kpi"><b>${backers}</b><label>backers</label></div>
-     </div>`;
-  popCounts(box, ".sb-kpi b");
-  tickCountdowns();
 }
 
 /* generic confetti burst on any element (reuses .confetti styles) */

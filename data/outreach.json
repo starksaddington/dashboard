@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-21T15:46:21",
+  "generatedAt": "2026-06-21T16:19:05",
   "totals": {
     "prospects": 2534,
-    "emailable": 1282,
+    "emailable": 1307,
     "drafted": 0,
-    "sent": 521,
-    "remaining": 740,
-    "forms": 1026,
-    "social": 226
+    "sent": 524,
+    "remaining": 762,
+    "forms": 1002,
+    "social": 225
   },
   "byTier": [
     {
@@ -64,8 +64,14 @@
   ],
   "today": [],
   "nextUp": [
-    "Bitci.com",
-    "JMRacing",
-    "Race Spec"
+    "Razer",
+    "Thorne",
+    "Compass Mining"
+  ],
+  "sentLog": [
+    {
+      "date": "2026-06-21",
+      "total": 524
+    }
   ]
 }

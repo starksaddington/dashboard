@@ -23,6 +23,7 @@ let sponCatChart = null, sponTierChart = null;
 let countdownTargets = [];   // [{el, ts}] for the strip
 let heroTarget = null;       // ms
 let nascarTarget = null;     // ms
+let sponRaceTarget = null;   // ms — Joseph's next race, for the status bar
 
 document.addEventListener("DOMContentLoaded", () => {
   tickClock();
@@ -58,6 +59,7 @@ function renderAll() {
   renderNewsTabs();
   renderLinks();
   renderMyRaces();
+  renderSponHero();
   renderOutreach();
   renderSponsors();
   renderDailyGrid();
@@ -207,6 +209,18 @@ function tickCountdowns() {
     const el = $("#nascarCd");
     if (el) { const d = nascarTarget - now; el.textContent = d <= 0 ? "Race weekend!" : "in " + compact(d, true); }
   }
+  if (sponRaceTarget) {
+    const el = $("#sbCountdown");
+    if (el) {
+      const d = sponRaceTarget - now;
+      el.innerHTML = d <= 0 ? `<b class="sb-live">🟢 RACE WEEKEND</b>` : fullCount(d);
+    }
+  }
+}
+
+function fullCount(ms) {
+  const p = parts(ms);
+  return `${+p.d}<small>d</small> ${+p.h}<small>h</small> ${+p.m}<small>m</small> ${p.s}<small>s</small>`;
 }
 
 function parts(ms) {
@@ -466,6 +480,83 @@ function renderMyRaces() {
     `${done} of ${dated.length} rounds complete · source: ${(BUNDLE.config && BUNDLE.config.racesSource) || "config.json"} · edit data/config.json`;
 }
 
+/* ---------- shared sponsor/race helpers ---------- */
+function sponTotals() {
+  const s = BUNDLE.sponsors || {};
+  const tiers = (s.tiers || []).map(t => ({ ...t, revenue: (t.amount || 0) * (t.count || 0) }));
+  return {
+    raised: tiers.reduce((a, t) => a + t.revenue, 0),
+    backers: tiers.reduce((a, t) => a + (t.count || 0), 0),
+    goal: s.goal || 0,
+  };
+}
+function nextRace() {
+  const races = (BUNDLE.config && BUNDLE.config.races) || [];
+  const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  const dated = races.map(r => ({ ...r, ts: Date.parse(r.date + "T12:00:00") }))
+    .filter(r => isFinite(r.ts)).sort((a, b) => a.ts - b.ts);
+  return dated.find(r => r.ts >= t0.getTime()) || null;
+}
+function sentTotal() {
+  const t = (BUNDLE.outreach && BUNDLE.outreach.totals) || {};
+  return t.sent != null ? t.sent : (t.drafted || 0);
+}
+
+/* ---------- status bar: next race countdown + headline KPIs ---------- */
+function renderSponHero() {
+  const box = $("#sponHero");
+  if (!box) return;
+  const { raised, backers } = sponTotals();
+  const nr = nextRace();
+  sponRaceTarget = nr ? nr.ts : null;
+  const fmt = n => "$" + Math.round(n).toLocaleString();
+  box.innerHTML =
+    `<div class="sb-race">
+       <span class="sb-flag">🏁</span>
+       <div class="sb-rwrap">
+         <span class="sb-rlabel">NEXT RACE${nr && nr.seriesTag ? " · " + esc(nr.seriesTag) : ""}</span>
+         <span class="sb-rname">${nr ? esc(nr.name) : "Schedule TBA"}</span>
+         <span class="sb-cd" id="sbCountdown">—</span>
+       </div>
+     </div>
+     <div class="sb-kpis">
+       <div class="sb-kpi hot"><b>${fmt(raised)}</b><label>raised</label></div>
+       <div class="sb-kpi"><b>${sentTotal()}</b><label>sent</label></div>
+       <div class="sb-kpi"><b>${backers}</b><label>backers</label></div>
+     </div>`;
+  popCounts(box, ".sb-kpi b");
+  tickCountdowns();
+}
+
+/* generic confetti burst on any element (reuses .confetti styles) */
+function popConfetti(el, n) {
+  if (!el) return;
+  if (getComputedStyle(el).position === "static") el.style.position = "relative";
+  const wrap = document.createElement("div");
+  wrap.className = "confetti";
+  for (let i = 0; i < (n || 30); i++) {
+    const s = document.createElement("span");
+    s.style.left = Math.random() * 100 + "%";
+    s.style.setProperty("--i", i);
+    s.style.setProperty("--h", Math.floor(Math.random() * 360));
+    wrap.appendChild(s);
+  }
+  el.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 2400);
+}
+/* fire confetti once whenever a new $10k milestone is crossed between visits */
+function checkSponMilestone(raised, box) {
+  const step = 10000;
+  const ms = Math.floor(raised / step) * step;
+  if (ms < step) return;
+  let last = 0;
+  try { last = parseInt(localStorage.getItem("enzo.spxMilestone") || "0", 10) || 0; } catch {}
+  if (ms > last) {
+    localStorage.setItem("enzo.spxMilestone", String(ms));
+    setTimeout(() => popConfetti(box, 38), 450);
+  }
+}
+
 /* ---------- Sponsor Pipeline (live from the Racing Contacts sheet) ---------- */
 /* count-up animation for headline numbers (keeps any $ prefix) */
 function popCounts(scope, sel) {
@@ -523,6 +614,33 @@ function renderOutreach() {
     funnelHtml += `<div class="fnl-stage ${st.cls}" style="width:${w}%"><b>${st.v.toLocaleString()}</b><span>${st.k}</span></div>`;
   });
   funnelHtml += `</div>`;
+
+  // momentum sparkline (cumulative sent over time, from data/sent_log.json)
+  const log = (o.sentLog || []).filter(p => p && isFinite(p.total));
+  let sparkHtml;
+  if (log.length >= 2) {
+    const vals = log.map(p => p.total);
+    const mn = Math.min(...vals), mx = Math.max(...vals), span = (mx - mn) || 1;
+    const W = 280, H = 44;
+    const pts = log.map((p, i) => [
+      (i / (log.length - 1)) * W,
+      (H - 3) - ((p.total - mn) / span) * (H - 8),
+    ]);
+    const poly = pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+    const last = pts[pts.length - 1];
+    const delta = vals[vals.length - 1] - vals[vals.length - 2];
+    sparkHtml =
+      `<div class="spark">
+         <div class="spark-h"><span>📈 Sent momentum</span><em>${delta >= 0 ? "+" : ""}${delta} latest</em></div>
+         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="spark-svg">
+           <polyline points="${poly}" fill="none" stroke="#2bd47a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+           <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.2" fill="#2bd47a"/>
+         </svg>
+         <div class="spark-f"><span>${esc((log[0].date || "").slice(5))}</span><span>${esc((log[log.length - 1].date || "").slice(5))}</span></div>
+       </div>`;
+  } else {
+    sparkHtml = `<div class="spark muted">📈 Sent momentum — <em>trend builds daily</em>${log.length ? ` · logging since ${esc(log[0].date.slice(5))}` : ""}</div>`;
+  }
   const foot = [];
   if (o.sheetUrl) foot.push(`<a href="${esc(o.sheetUrl)}" target="_blank" rel="noopener">Open tracker ↗</a>`);
   if (o.draftsUrl) foot.push(`<a href="${esc(o.draftsUrl)}" target="_blank" rel="noopener">Review drafts in Gmail ↗</a>`);
@@ -540,6 +658,7 @@ function renderOutreach() {
        <span class="p"><b>${formRate}%</b> form-only</span>
      </div>
      ${funnelHtml}
+     ${sparkHtml}
      <div class="spon-charts">
        <div class="spon-donut"><canvas id="sponCatChart"></canvas><span class="spon-donut-cap">Prospects by category</span></div>
        <div class="spon-donut"><canvas id="sponTierChart"></canvas><span class="spon-donut-cap">Prospects by tier</span></div>
@@ -624,6 +743,12 @@ function renderSponsors() {
     }).join("") + `</div>`;
   }
 
+  const marks = goal ? [0.25, 0.5, 0.75].map(f => ({ pct: f * 100, val: goal * f })) : [];
+  const nextMs = marks.find(mk => mk.val > raised);
+  const goalCap = goal
+    ? (nextMs ? `next milestone: ${fmt(nextMs.val)} · ${fmt(nextMs.val - raised)} to go` : "🏆 goal smashed — set a stretch target!")
+    : "";
+
   box.innerHTML =
     `<div class="spx-kpis">
        <div class="spx-kpi hot"><b>${fmt(raised)}</b><label>raised</label></div>
@@ -633,7 +758,11 @@ function renderSponsors() {
      </div>
      ${goal ? `<div class="spx-goal">
        <div class="spx-goal-head"><span>🎯 Season goal</span><b>${fmt(raised)} / ${fmt(goal)} · ${goalPct}%</b></div>
-       <div class="spx-track big"><div class="spx-fill" style="width:${goalPct}%;background:linear-gradient(90deg,#f7931a,#ffb84d)"></div></div>
+       <div class="spx-track big">
+         <div class="spx-fill spx-anim" data-w="${goalPct}" style="width:0;background:linear-gradient(90deg,#f7931a,#ffb84d)"></div>
+         ${marks.map(mk => `<span class="spx-mark${mk.val <= raised ? " hit" : ""}" style="left:${mk.pct}%"></span>`).join("")}
+       </div>
+       <div class="spx-goal-cap">${esc(goalCap)}</div>
      </div>` : ""}
      <div class="spx-cols">
        <div><div class="spx-h">Revenue by tier</div>${tierBars}</div>
@@ -641,6 +770,8 @@ function renderSponsors() {
      </div>
      ${s.source ? `<div class="spx-src">source: ${esc(s.source)}</div>` : ""}`;
   popCounts(box, ".spx-kpi b");
+  setTimeout(() => { const f = box.querySelector(".spx-anim"); if (f) f.style.width = f.dataset.w + "%"; }, 80);
+  checkSponMilestone(raised, box);
 }
 
 /* ---------- Daily Grid (recurring to-dos) ---------- */

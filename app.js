@@ -47,24 +47,33 @@ async function load(isRefresh) {
   }
 }
 
+/* Render each module in isolation so one failure (e.g. a blocked Chart.js CDN)
+   can't abort the rest of the dashboard. Errors are logged, not thrown. */
+function safeRender(label, fn) {
+  try { fn(); } catch (e) { console.error(`dashboard: "${label}" module failed —`, e); }
+}
+
 function renderAll() {
-  renderGreeting();
-  renderBizStrip();
-  const events = buildEvents();
-  renderHero();
-  renderStrip(events);
-  renderChartTabs();
-  renderProgress();
-  renderHQ();
-  renderNewsTabs();
-  renderLinks();
-  renderMyRaces();
-  renderSeasonSnapshot();
-  renderOutreach();
-  renderSponsors();
-  renderDailyGrid();
-  $("#footStamp").textContent =
-    "Updated " + new Date().toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
+  let events = [];
+  try { events = buildEvents(); } catch (e) { console.error("buildEvents failed —", e); }
+  safeRender("greeting", renderGreeting);
+  safeRender("bizStrip", renderBizStrip);
+  safeRender("hero", renderHero);
+  safeRender("seriesStrip", () => renderStrip(events));
+  safeRender("championship", renderChartTabs);
+  safeRender("seasonProgress", renderProgress);
+  safeRender("driver", renderHQ);
+  safeRender("news", renderNewsTabs);
+  safeRender("links", renderLinks);
+  safeRender("myRaces", renderMyRaces);
+  safeRender("seasonSnapshot", renderSeasonSnapshot);
+  safeRender("outreach", renderOutreach);
+  safeRender("sponsorsSecured", renderSponsors);
+  safeRender("dailyGrid", renderDailyGrid);
+  try {
+    $("#footStamp").textContent =
+      "Updated " + new Date().toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
+  } catch (e) { /* noop */ }
 }
 
 /* ---------- greeting ---------- */

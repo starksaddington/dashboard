@@ -1,11 +1,10 @@
 {
-  "generatedAt": "2026-06-21T17:34:03",
+  "generatedAt": "2026-06-21T19:11:06",
   "totals": {
     "prospects": 2534,
     "emailable": 1307,
     "drafted": 0,
-    "sent": 532,
-    "remaining": 754,
+    "remaining": 744,
     "forms": 1002,
     "social": 225
   },
@@ -67,16 +66,5 @@
     "Razer",
     "Thorne",
     "Compass Mining"
-  ],
-  "sentLog": [
-    {
-      "date": "2026-06-21",
-      "total": 532
-    }
-  ],
-  "health": {
-    "bounced": 10,
-    "declined": 5,
-    "dailyCap": 75
-  }
+  ]
 }

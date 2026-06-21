@@ -402,7 +402,7 @@ function renderNascar() {
 function renderNewsTabs() {
   const news = BUNDLE.news || {};
   const order = ((BUNDLE.config && BUNDLE.config.seriesOrder) || []).filter(k => news[k]);
-  if (news.all) order.push("all");
+  if (news.all) order.unshift("all");
   $("#newsTabs").innerHTML = order.map((k, i) =>
     `<button data-k="${k}" class="${i === 0 ? "on" : ""}">${(SERIES_META[k] || {}).label || k}</button>`).join("");
   $$("#newsTabs button").forEach(b => b.addEventListener("click", () => {

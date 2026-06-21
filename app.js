@@ -417,7 +417,7 @@ function renderNewsTabs() {
 
 function drawNews(key) {
   const feed = (BUNDLE.news || {})[key] || {};
-  const items = feed.items || [];
+  const items = (feed.items || []).slice(0, 12);
   const grid = $("#newsGrid");
   if (!items.length) {
     grid.innerHTML = `<div class="news-empty">No ${(SERIES_META[key] || {}).label || key} headlines right now${feed.stale ? " (offline)" : ""}.</div>`;

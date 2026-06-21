@@ -33,6 +33,7 @@ import html
 import threading
 import urllib.request
 import urllib.error
+from email.utils import parsedate_tz, mktime_tz
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
@@ -56,6 +57,20 @@ RSS_FEEDS = {
     "supercars": "https://www.motorsport.com/rss/v8supercars/news/",
     "f1": "https://www.motorsport.com/rss/f1/news/",
 }
+
+# --- RACER.com feeds (fresher, US-focused). No trailing slash (it 308s). ----
+# Only series with a real RACER category feed; others fall back to Motorsport.
+RACER_FEEDS = {
+    "all": "https://racer.com/feed",
+    "indycar": "https://racer.com/indycar/feed",
+    "nascar": "https://racer.com/nascar/feed",
+    "imsa": "https://racer.com/imsa/feed",
+    "f1": "https://racer.com/formula-1/feed",
+}
+
+# Drop any headline older than this so the dashboard never shows stale news.
+NEWS_MAX_AGE = 3 * 86400   # 3 days
+NEWS_LIMIT = 12            # max headlines shown at any time
 
 # NASCAR public cacher (series 1=Cup, 2=Xfinity, 3=Trucks)
 NASCAR_URL = "https://cf.nascar.com/cacher/{year}/{series}/race_list_basic.json"
@@ -116,6 +131,17 @@ def _tag(block, name):
     return val
 
 
+def _pub_epoch(s):
+    """Parse an RSS pubDate (RFC-822) to a UTC epoch; None if unparseable."""
+    if not s:
+        return None
+    try:
+        tup = parsedate_tz(s)
+        return mktime_tz(tup) if tup else None
+    except Exception:
+        return None
+
+
 def parse_rss(xml, source, limit=12):
     items = []
     for block in re.findall(r"<item>(.*?)</item>", xml, re.S | re.I):
@@ -135,6 +161,7 @@ def parse_rss(xml, source, limit=12):
             "title": title,
             "link": link,
             "date": pub,
+            "ts": _pub_epoch(pub),
             "summary": (desc[:220] + "…") if len(desc) > 220 else desc,
             "image": img,
             "source": source,
@@ -146,13 +173,33 @@ def parse_rss(xml, source, limit=12):
 
 def get_news(series):
     series = series if series in RSS_FEEDS else "all"
-    url = RSS_FEEDS[series]
-    label = {"wec": "WEC", "imsa": "IMSA", "nascar": "NASCAR",
-             "indycar": "IndyCar", "wrc": "WRC", "supercars": "Supercars",
-             "f1": "F1", "all": "Motorsport"}.get(series, series.upper())
 
     def produce():
-        return parse_rss(_fetch(url), label)
+        items = []
+        # RACER first (fresher, US-focused), then Motorsport.com as backup.
+        racer = RACER_FEEDS.get(series)
+        if racer:
+            try:
+                items += parse_rss(_fetch(racer), "RACER")
+            except Exception:
+                pass
+        try:
+            items += parse_rss(_fetch(RSS_FEEDS[series]), "Motorsport.com")
+        except Exception:
+            pass
+        # keep only fresh (< 3 days), dedupe by title, newest first, cap at 12
+        cutoff = time.time() - NEWS_MAX_AGE
+        fresh = [it for it in items if it.get("ts") and it["ts"] >= cutoff]
+        seen, out = set(), []
+        for it in sorted(fresh, key=lambda x: x["ts"], reverse=True):
+            key = re.sub(r"\W+", "", (it.get("title") or "").lower())[:60]
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            out.append(it)
+            if len(out) >= NEWS_LIMIT:
+                break
+        return out
 
     try:
         items, stale = _cached("news:" + series, CACHE_TTL, produce)

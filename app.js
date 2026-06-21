@@ -59,6 +59,7 @@ function renderAll() {
   renderNewsTabs();
   renderLinks();
   renderMyRaces();
+  renderSeasonSnapshot();
   renderOutreach();
   renderSponsors();
   renderDailyGrid();
@@ -516,6 +517,32 @@ function checkSponMilestone(raised, box) {
     localStorage.setItem("enzo.spxMilestone", String(ms));
     setTimeout(() => popConfetti(box, 38), 450);
   }
+}
+
+/* ---------- Season Snapshot (KPIs from config.races) ---------- */
+function renderSeasonSnapshot() {
+  const box = $("#seasonSnap");
+  if (!box) return;
+  const races = (BUNDLE.config && BUNDLE.config.races) || [];
+  if (!races.length) { box.innerHTML = `<div class="news-empty">No races in config.json yet.</div>`; return; }
+  const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  const t0ms = t0.getTime();
+  const dated = races.map(r => ({ ...r, ts: Date.parse(r.date + "T12:00:00") }))
+    .filter(r => isFinite(r.ts)).sort((a, b) => a.ts - b.ts);
+  const total = dated.length;
+  const done = dated.filter(r => r.ts < t0ms).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const series = new Set(dated.map(r => (r.seriesTag || "").trim()).filter(Boolean)).size;
+  const nr = nextRace();
+  const days = nr ? Math.max(0, Math.round((nr.ts - t0ms) / 864e5)) : null;
+  box.innerHTML =
+    `<div class="spx-kpis">
+       <div class="spx-kpi hot"><b>${done}/${total}</b><label>rounds done</label></div>
+       <div class="spx-kpi"><b>${pct}%</b><label>season done</label></div>
+       <div class="spx-kpi"><b>${series}</b><label>series raced</label></div>
+       <div class="spx-kpi"><b>${total}</b><label>race weekends</label></div>
+     </div>
+     ${nr ? `<div class="snap-next">🏁 <b>Next:</b> ${esc(nr.name)}${nr.seriesTag ? " · " + esc(nr.seriesTag) : ""} · ${days === 0 ? "today" : "in " + days + " days"}${nr.dateLabel ? ` (${esc(nr.dateLabel)})` : ""}</div>` : ""}`;
 }
 
 /* ---------- Sponsor Pipeline (live from the Racing Contacts sheet) ---------- */

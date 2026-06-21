@@ -467,6 +467,25 @@ function renderMyRaces() {
 }
 
 /* ---------- Sponsor Pipeline (live from the Racing Contacts sheet) ---------- */
+/* count-up animation for headline numbers (keeps any $ prefix) */
+function popCounts(scope, sel) {
+  scope.querySelectorAll(sel).forEach(el => {
+    const raw = (el.textContent || "").trim();
+    const money = raw.charAt(0) === "$";
+    const target = parseInt(raw.replace(/[^0-9]/g, ""), 10);
+    if (!isFinite(target) || target <= 0) return;
+    el.classList.add("pop-num");
+    const dur = 850, t0 = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      const v = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      el.textContent = (money ? "$" : "") + v.toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
 function renderOutreach() {
   const o = BUNDLE.outreach;
   const box = $("#sponsorBox");
@@ -488,6 +507,22 @@ function renderOutreach() {
   const today = o.today || [];
   const shown = today.slice(0, 8);
   const more = today.length - shown.length;
+  const fst = [
+    { k: "Prospects", v: t.prospects || 0, cls: "" },
+    { k: "Emailable", v: t.emailable || 0, cls: "s2" },
+    { k: "Sent", v: sent || 0, cls: "s3" },
+  ];
+  const fmax = fst[0].v || 1;
+  let funnelHtml = `<div class="fnl">`;
+  fst.forEach((st, i) => {
+    if (i > 0) {
+      const conv = fst[i - 1].v ? Math.round(st.v / fst[i - 1].v * 100) : 0;
+      funnelHtml += `<div class="fnl-conv">▼ <b>${conv}%</b> ${i === 1 ? "reachable" : "contacted"}</div>`;
+    }
+    const w = Math.max(34, Math.round(st.v / fmax * 100));
+    funnelHtml += `<div class="fnl-stage ${st.cls}" style="width:${w}%"><b>${st.v.toLocaleString()}</b><span>${st.k}</span></div>`;
+  });
+  funnelHtml += `</div>`;
   const foot = [];
   if (o.sheetUrl) foot.push(`<a href="${esc(o.sheetUrl)}" target="_blank" rel="noopener">Open tracker ↗</a>`);
   if (o.draftsUrl) foot.push(`<a href="${esc(o.draftsUrl)}" target="_blank" rel="noopener">Review drafts in Gmail ↗</a>`);
@@ -504,8 +539,7 @@ function renderOutreach() {
        <span class="p"><b>${pct}%</b> of emailable contacted</span>
        <span class="p"><b>${formRate}%</b> form-only</span>
      </div>
-     <div class="spon-bar"><div class="spon-bar-fill" style="width:${pct}%"></div>
-       <span class="spon-bar-tx">${sent} / ${t.emailable} emailable contacted</span></div>
+     ${funnelHtml}
      <div class="spon-charts">
        <div class="spon-donut"><canvas id="sponCatChart"></canvas><span class="spon-donut-cap">Prospects by category</span></div>
        <div class="spon-donut"><canvas id="sponTierChart"></canvas><span class="spon-donut-cap">Prospects by tier</span></div>
@@ -543,6 +577,7 @@ function renderOutreach() {
     data: { labels: tier.map(x => x.name), datasets: [{ data: tier.map(x => x.count), backgroundColor: ["#f7931a", "#3d8bff", "#2bd47a", "#c06bff"], borderWidth: 0 }] },
     options: donutOpts(),
   });
+  popCounts(box, ".spon-stat b, .fnl-stage b");
 }
 
 /* ---------- Sponsorship Secured ---------- */
@@ -605,6 +640,7 @@ function renderSponsors() {
        <div><div class="spx-h">Sponsorship funnel</div>${funnel}</div>
      </div>
      ${s.source ? `<div class="spx-src">source: ${esc(s.source)}</div>` : ""}`;
+  popCounts(box, ".spx-kpi b");
 }
 
 /* ---------- Daily Grid (recurring to-dos) ---------- */

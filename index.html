@@ -38,7 +38,18 @@
   .spon-donut{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 10px 8px;height:200px;display:flex;flex-direction:column}
   .spon-donut canvas{flex:1;min-height:0}
   .spon-donut-cap{text-align:center;font-size:.68rem;color:#9d978c;text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
-  @media(max-width:680px){.spon-stats{grid-template-columns:repeat(2,1fr)}.spon-k{flex-basis:100%}.spon-charts{grid-template-columns:1fr}}
+  /* Pipeline funnel */
+  .fnl{display:flex;flex-direction:column;align-items:center;margin:8px 0 18px}
+  .fnl-stage{position:relative;border-radius:9px;padding:9px 16px;text-align:center;color:#0a0d14;background:linear-gradient(90deg,#f7931a,#ffb84d);box-shadow:0 3px 12px rgba(247,147,26,.2);transition:width .7s cubic-bezier(.22,1,.36,1)}
+  .fnl-stage b{display:block;font-family:'Orbitron',sans-serif;font-size:1.32rem;line-height:1}
+  .fnl-stage span{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;opacity:.82;font-weight:700}
+  .fnl-stage.s2{background:linear-gradient(90deg,#e8820f,#ffa838)}
+  .fnl-stage.s3{background:linear-gradient(90deg,#1fae63,#46e58c);color:#04210f;animation:fnlpulse 2.6s ease-in-out infinite}
+  @keyframes fnlpulse{0%,100%{box-shadow:0 0 18px rgba(43,212,122,.3)}50%{box-shadow:0 0 32px rgba(43,212,122,.62)}}
+  .fnl-conv{font-size:.68rem;color:#9d978c;padding:6px 0;letter-spacing:.03em}
+  .fnl-conv b{color:#2bd47a;font-family:'Orbitron',sans-serif;font-size:.78rem}
+  .pop-num{transition:color .2s}
+  @media(max-width:680px){.spon-stats{grid-template-columns:repeat(2,1fr)}.spon-k{flex-basis:100%}.spon-charts{grid-template-columns:1fr}.fnl-stage{min-width:130px}}
   /* Sponsorship Secured */
   .spx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
   .spx-kpi{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 10px;text-align:center}

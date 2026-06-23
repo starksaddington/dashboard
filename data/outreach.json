@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-23T07:15:19",
+  "generatedAt": "2026-06-23T07:30:07",
   "totals": {
     "prospects": 2534,
-    "emailable": 1397,
+    "emailable": 1399,
     "drafted": 0,
     "sent": 618,
-    "remaining": 754,
-    "forms": 917,
+    "remaining": 756,
+    "forms": 915,
     "social": 220
   },
   "byTier": [

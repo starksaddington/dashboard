@@ -50,7 +50,7 @@
     { "name": "Miami Grand Prix", "seriesTag": "FARA", "track": "Homestead-Miami Speedway", "date": "2026-03-08", "dateLabel": "Mar 6-8" },
     { "name": "The Mitty", "seriesTag": "IMSA", "track": "Road Atlanta", "date": "2026-04-24" },
     { "name": "Memorial 300", "seriesTag": "FARA", "track": "Sebring International Raceway", "date": "2026-05-24", "dateLabel": "May 22-24" },
-    { "name": "Daytona Classic", "seriesTag": "FARA", "track": "Daytona International Speedway", "date": "2026-06-28", "dateLabel": "Jun 25-28" },
+    { "name": "Daytona Classic", "seriesTag": "SCCA", "track": "Daytona International Speedway", "date": "2026-06-28", "dateLabel": "Jun 25-28" },
     { "name": "Atlanta 200", "seriesTag": "FARA", "track": "Road Atlanta", "date": "2026-08-02", "dateLabel": "Jul 31-Aug 2" },
     { "name": "Homestead 250 / CRS", "seriesTag": "FARA·CRS", "track": "Homestead-Miami Speedway", "date": "2026-10-04", "dateLabel": "Oct 2-4" },
     { "name": "Hankook 300 / CRS P1", "seriesTag": "FARA·CRS", "track": "PI Motor Club", "date": "2026-11-15", "dateLabel": "TBD" },

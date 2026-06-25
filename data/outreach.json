@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-25T12:15:19",
+  "generatedAt": "2026-06-25T12:45:18",
   "totals": {
     "prospects": 2534,
-    "emailable": 1398,
+    "emailable": 1397,
     "drafted": 0,
-    "sent": 772,
-    "remaining": 583,
-    "forms": 916,
+    "sent": 769,
+    "remaining": 580,
+    "forms": 917,
     "social": 220
   },
   "byTier": [
@@ -87,12 +87,12 @@
     },
     {
       "date": "2026-06-25",
-      "total": 772
+      "total": 769
     }
   ],
   "health": {
-    "bounced": 29,
-    "declined": 8,
+    "bounced": 30,
+    "declined": 12,
     "dailyCap": 75
   }
 }

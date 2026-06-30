@@ -13,7 +13,19 @@
       "Bitcoin-native audience (TOSHI ↔ Satoshi)",
       "Daily content across 3 platforms",
       "Real-world Spec Miata + sim racing"
-    ]
+    ],
+    "benefits": [
+      "Logo on car, helmet & suit",
+      "Media & event appearances",
+      "In-car content + dedicated shoutouts"
+    ],
+    "packages": [
+      { "name": "Satoshi Club", "price": 5000, "partners": ["CleanSpark", "Meanwhile", "Bitcoin Mining World"] },
+      { "name": "Paddock Pass", "price": 2000, "partners": ["Tap Racing Engines", "Figment", "FutureTech Georgia"] },
+      { "name": "Wen Moon Club", "price": 500, "members": 20 },
+      { "name": "HODL Club", "price": 150, "members": 61 }
+    ],
+    "packagesSource": "saddingtonracing.com — tiers & current partners (Jun 30, 2026)"
   },
   "name": "Joseph",
   "tagline": "Lights out and away we go.",

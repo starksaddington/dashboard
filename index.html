@@ -153,6 +153,24 @@
   .pitch-prov{font-size:.64rem;color:#75706a;text-align:right;line-height:1.4}
   @media(max-width:880px){.pitch{grid-template-columns:1fr;padding:24px 22px}.pitch-h{font-size:1.7rem}}
   @media(max-width:680px){.pitch-tiles{grid-template-columns:repeat(2,1fr)}.pitch-h{font-size:1.5rem}}
+  /* ===== Partnership packages (under the pitch) ===== */
+  .packs{background:rgba(18,16,13,.5);border:1px solid rgba(247,147,26,.2);border-radius:20px;padding:24px 28px;margin:0 0 26px}
+  .pk-h{font-family:'Rajdhani','Bai Jamjuree',sans-serif;font-size:1.5rem;font-weight:700;color:#f6f3ee;margin:0 0 8px}
+  .pk-sub{font-size:.72rem;color:#9d978c;text-transform:uppercase;letter-spacing:.06em}
+  .pk-benefits{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 18px}
+  .pk-benefit{background:rgba(255,255,255,.04);border:1px solid rgba(247,147,26,.2);color:#f0d9b8;border-radius:999px;padding:5px 12px;font-size:.78rem}
+  .pk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .pk-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:5px}
+  .pk-card.top{border-color:rgba(247,147,26,.45);background:linear-gradient(160deg,rgba(247,147,26,.11),rgba(255,255,255,.02))}
+  .pk-name{font-weight:700;color:#f0f0ee;font-size:.92rem}
+  .pk-price{font-family:'Orbitron',sans-serif;font-size:1.45rem;color:#f7931a;line-height:1;margin-bottom:2px}
+  .pk-proof-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;color:#75706a;margin-top:6px}
+  .pk-proof{display:flex;flex-wrap:wrap;gap:5px}
+  .pk-proof span{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:3px 8px;font-size:.71rem;color:#c9c3b8}
+  .pk-cta-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .pk-src{font-size:.63rem;color:#75706a}
+  @media(max-width:880px){.pk-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.pk-grid{grid-template-columns:1fr}}
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23f7931a'/%3E%3Ctext x='50' y='73' font-size='62' font-weight='bold' text-anchor='middle' fill='%23000' font-family='Arial'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
 </head>
@@ -181,6 +199,9 @@
 
   <!-- SPONSOR CTA — partner-facing pitch (top of page) -->
   <section class="pitch" id="sponsorPitch"></section>
+
+  <!-- PARTNERSHIP PACKAGES (under the pitch) -->
+  <section class="packs" id="sponsorPacks"></section>
 
   <section class="hero">
     <div class="hero-left">

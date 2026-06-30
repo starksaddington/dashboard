@@ -57,6 +57,7 @@ function renderAll() {
   let events = [];
   try { events = buildEvents(); } catch (e) { console.error("buildEvents failed —", e); }
   safeRender("sponsorPitch", renderSocial);
+  safeRender("sponsorPacks", renderPackages);
   safeRender("greeting", renderGreeting);
   safeRender("bizStrip", renderBizStrip);
   safeRender("hero", renderHero);
@@ -174,6 +175,48 @@ function renderSocial() {
       },
     });
   }
+}
+
+/* ---------- Partnership packages (under the pitch) ----------
+   Tiers + prices + CURRENT PARTNERS (social proof) from config.social.packages
+   — sourced from saddingtonracing.com, badged with provenance. */
+function renderPackages() {
+  const box = $("#sponsorPacks");
+  if (!box) return;
+  const s = (BUNDLE.config || {}).social || {};
+  const pk = s.packages;
+  if (!Array.isArray(pk) || !pk.length) { box.style.display = "none"; return; }
+  const email = s.contactEmail || "starksaddington@gmail.com";
+  const mailto = `mailto:${email}?subject=${encodeURIComponent("Sponsoring TOSHI #81 — Saddington Racing")}`;
+  const fmt = n => "$" + Number(n || 0).toLocaleString();
+
+  const cards = pk.map((p, i) => {
+    let proofLbl = "", proof = "";
+    if (p.partners && p.partners.length) {
+      proofLbl = `<div class="pk-proof-lbl">Current partners</div>`;
+      proof = `<div class="pk-proof">${p.partners.map(x => `<span>${esc(x)}</span>`).join("")}</div>`;
+    } else if (p.members) {
+      proofLbl = `<div class="pk-proof-lbl">Members</div>`;
+      proof = `<div class="pk-proof"><span>${p.members} & counting</span></div>`;
+    }
+    return `<div class="pk-card${i === 0 ? " top" : ""}">
+      <div class="pk-name">${esc(p.name)}</div>
+      <div class="pk-price">${fmt(p.price)}</div>
+      ${proofLbl}${proof}
+    </div>`;
+  }).join("");
+
+  const benefits = (s.benefits || []).map(b => `<span class="pk-benefit">✓ ${esc(b)}</span>`).join("");
+
+  box.innerHTML =
+    `<h3 class="pk-h">Partnership Packages</h3>
+     <span class="pk-sub">Every partner gets</span>
+     <div class="pk-benefits">${benefits}</div>
+     <div class="pk-grid">${cards}</div>
+     <div class="pk-cta-row">
+       <a class="pitch-cta" href="${mailto}">Become a sponsor →</a>
+       ${s.packagesSource ? `<span class="pk-src">tiers & partners via ${esc(s.packagesSource)}</span>` : ""}
+     </div>`;
 }
 
 /* ---------- greeting ---------- */

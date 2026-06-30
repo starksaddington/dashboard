@@ -1,4 +1,20 @@
 {
+  "social": {
+    "asOf": "Jun 30, 2026",
+    "verified": "YouTube Data API + public TikTok profile",
+    "contactEmail": "starksaddington@gmail.com",
+    "tagline": "Put your brand on one of America's youngest pro racers.",
+    "platforms": [
+      { "key": "tiktok", "label": "TikTok", "handle": "@saddingtonracing", "url": "https://www.tiktok.com/@saddingtonracing", "followers": 123600, "likes": 1400000, "videos": 5424, "source": "public profile" },
+      { "key": "youtube", "label": "YouTube", "handle": "@saddingtonracing", "url": "https://www.youtube.com/@saddingtonracing", "subscribers": 1860, "views": 739682, "videos": 798, "source": "YouTube Data API" },
+      { "key": "instagram", "label": "Instagram", "handle": "@saddingtonracing", "url": "https://www.instagram.com/saddingtonracing", "followers": 2586, "source": "profile (owner-confirmed)" }
+    ],
+    "props": [
+      "Bitcoin-native audience (TOSHI ↔ Satoshi)",
+      "Daily content across 3 platforms",
+      "Real-world Spec Miata + sim racing"
+    ]
+  },
   "name": "Joseph",
   "tagline": "Lights out and away we go.",
   "team": {

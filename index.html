@@ -120,6 +120,39 @@
   .spx-fn-lbl em{color:#2bd47a;font-style:normal;font-weight:600;margin-left:4px}
   .spx-src{margin-top:14px;font-size:.66rem;color:#75706a;text-align:right}
   @media(max-width:680px){.spx-kpis{grid-template-columns:repeat(2,1fr)}.spx-cols{grid-template-columns:1fr;gap:16px}}
+  /* ===== Sponsor pitch hero (partner-facing, top of page) ===== */
+  .pitch{position:relative;overflow:hidden;display:grid;grid-template-columns:1.08fr .92fr;gap:30px;
+    background:linear-gradient(120deg,rgba(247,147,26,.15),rgba(10,13,20,.5) 56%),rgba(18,16,13,.62);
+    border:1px solid rgba(247,147,26,.34);border-radius:22px;padding:30px 34px;margin:6px 0 26px;
+    box-shadow:0 18px 50px rgba(0,0,0,.42)}
+  .pitch-glow{position:absolute;top:-65%;right:-12%;width:440px;height:440px;border-radius:50%;
+    background:radial-gradient(circle,rgba(247,147,26,.3),transparent 70%);pointer-events:none}
+  .pitch-main{position:relative;z-index:1}
+  .pitch-eyebrow{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:#f7931a;font-weight:700;margin-bottom:12px}
+  .pitch-h{font-family:'Rajdhani','Bai Jamjuree',sans-serif;font-size:2.15rem;line-height:1.08;font-weight:700;color:#f6f3ee;margin:0 0 12px;max-width:18ch}
+  .pitch-sub{font-size:.95rem;line-height:1.5;color:#c9c3b8;margin:0 0 18px;max-width:50ch}
+  .pitch-props{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .pitch-prop{background:rgba(255,255,255,.04);border:1px solid rgba(247,147,26,.22);color:#f0d9b8;border-radius:999px;padding:6px 13px;font-size:.78rem;font-weight:500}
+  .pitch-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:20px}
+  .pitch-cta{background:linear-gradient(90deg,#f7931a,#ffb84d);color:#0a0d14;font-weight:700;font-size:.96rem;padding:13px 24px;border-radius:12px;text-decoration:none;box-shadow:0 8px 24px rgba(247,147,26,.34);transition:transform .15s,box-shadow .15s}
+  .pitch-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(247,147,26,.5)}
+  .pitch-cta2{color:#f7931a;font-weight:600;font-size:.9rem;text-decoration:none;padding:13px 4px}
+  .pitch-cta2:hover{text-decoration:underline}
+  .pitch-plats{display:flex;flex-wrap:wrap;gap:10px}
+  .pitch-plat{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:8px 14px;text-decoration:none;transition:border-color .15s,background .15s}
+  .pitch-plat:hover{border-color:rgba(247,147,26,.4);background:rgba(247,147,26,.07)}
+  .pitch-plat b{color:#f0f0ee;font-size:.82rem}
+  .pitch-plat span{color:#9d978c;font-size:.72rem}
+  .pitch-side{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+  .pitch-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .pitch-tile{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 10px;text-align:center}
+  .pitch-tile b{display:block;font-family:'Orbitron',sans-serif;font-size:1.46rem;color:#f0f0ee;line-height:1}
+  .pitch-tile.big b{color:#f7931a;font-size:1.66rem}
+  .pitch-tile label{display:block;margin-top:6px;font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;color:#9d978c}
+  .pitch-chart{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:12px 12px 8px;height:150px}
+  .pitch-prov{font-size:.64rem;color:#75706a;text-align:right;line-height:1.4}
+  @media(max-width:880px){.pitch{grid-template-columns:1fr;padding:24px 22px}.pitch-h{font-size:1.7rem}}
+  @media(max-width:680px){.pitch-tiles{grid-template-columns:repeat(2,1fr)}.pitch-h{font-size:1.5rem}}
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23f7931a'/%3E%3Ctext x='50' y='73' font-size='62' font-weight='bold' text-anchor='middle' fill='%23000' font-family='Arial'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
 </head>
@@ -145,6 +178,9 @@
       </button>
     </div>
   </header>
+
+  <!-- SPONSOR CTA — partner-facing pitch (top of page) -->
+  <section class="pitch" id="sponsorPitch"></section>
 
   <section class="hero">
     <div class="hero-left">

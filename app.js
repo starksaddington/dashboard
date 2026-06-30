@@ -56,6 +56,7 @@ function safeRender(label, fn) {
 function renderAll() {
   let events = [];
   try { events = buildEvents(); } catch (e) { console.error("buildEvents failed —", e); }
+  safeRender("sponsorPitch", renderSocial);
   safeRender("greeting", renderGreeting);
   safeRender("bizStrip", renderBizStrip);
   safeRender("hero", renderHero);
@@ -74,6 +75,105 @@ function renderAll() {
     $("#footStamp").textContent =
       "Updated " + new Date().toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
   } catch (e) { /* noop */ }
+}
+
+/* ---------- Sponsor pitch hero (partner-facing, top of page) ----------
+   Verified audience numbers live in config.social (YouTube via Data API,
+   TikTok via public profile, Instagram owner-confirmed). Numbers are badged
+   with their as-of date + source — never fabricated. */
+let socialChart = null;
+function compactNum(n) {
+  if (!isFinite(n)) return "—";
+  if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, "") + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(n >= 1e5 ? 0 : 1).replace(/\.0$/, "") + "K";
+  return String(n);
+}
+function renderSocial() {
+  const box = $("#sponsorPitch");
+  if (!box) return;
+  const cfg = BUNDLE.config || {};
+  const s = cfg.social;
+  if (!s || !Array.isArray(s.platforms)) { box.style.display = "none"; return; }
+  const dr = cfg.driver || {}, team = cfg.team || {};
+  const P = {};
+  s.platforms.forEach(p => { P[p.key] = p; });
+  const tt = P.tiktok || {}, yt = P.youtube || {}, ig = P.instagram || {};
+
+  const followerVals = [tt.followers, yt.subscribers, ig.followers].filter(n => typeof n === "number");
+  const totalFollowers = followerVals.reduce((a, b) => a + b, 0);
+  const videos = (tt.videos || 0) + (yt.videos || 0);
+
+  const email = s.contactEmail || "starksaddington@gmail.com";
+  const mailto = `mailto:${email}?subject=${encodeURIComponent("Sponsoring TOSHI #81 — Saddington Racing")}`;
+
+  const tiles = [
+    { v: compactNum(totalFollowers) + "+", l: "followers" },
+    tt.likes ? { v: compactNum(tt.likes), l: "TikTok likes" } : null,
+    yt.views ? { v: compactNum(yt.views), l: "YouTube views" } : null,
+    videos ? { v: compactNum(videos) + "+", l: "videos posted" } : null,
+    { v: "Daily", l: "new content" },
+  ].filter(Boolean);
+
+  const props = (s.props || []).map(p => `<span class="pitch-prop">✓ ${esc(p)}</span>`).join("");
+  const plats = s.platforms.map(p => {
+    const head = typeof p.followers === "number" ? compactNum(p.followers) + " followers"
+      : typeof p.subscribers === "number" ? compactNum(p.subscribers) + " subs"
+      : "coming soon";
+    return `<a class="pitch-plat" href="${esc(p.url)}" target="_blank" rel="noopener">
+      <b>${esc(p.label)}</b><span>${head}</span></a>`;
+  }).join("");
+
+  box.innerHTML =
+    `<div class="pitch-glow"></div>
+     <div class="pitch-main">
+       <div class="pitch-eyebrow">🤝 Sponsorship · ${esc(team.name || "Saddington Racing")} · Bitcoin Racing USA</div>
+       <h2 class="pitch-h">${esc(s.tagline || "Partner with TOSHI #81.")}</h2>
+       <p class="pitch-sub">${esc(dr.note || "")} ${esc(dr.carClass || "")} — real-world &amp; sim, sharing every lap with a young, Bitcoin-native audience.</p>
+       <div class="pitch-props">${props}</div>
+       <div class="pitch-actions">
+         <a class="pitch-cta" href="${mailto}">Become a sponsor →</a>
+         <a class="pitch-cta2" href="${esc(team.site || "https://saddingtonracing.com/")}" target="_blank" rel="noopener">saddingtonracing.com</a>
+       </div>
+       <div class="pitch-plats">${plats}</div>
+     </div>
+     <div class="pitch-side">
+       <div class="pitch-tiles">
+         ${tiles.map((t, i) => `<div class="pitch-tile${i === 0 ? " big" : ""}"><b>${t.v}</b><label>${esc(t.l)}</label></div>`).join("")}
+       </div>
+       <div class="pitch-chart"><canvas id="socialChart"></canvas></div>
+       <div class="pitch-prov">Audience verified ${esc(s.asOf || "")}${s.verified ? " · " + esc(s.verified) : ""}</div>
+     </div>`;
+
+  // (no popCounts here: tiles show compact "128K+/1.4M" strings the digit-only
+  //  count-up animator would corrupt.)
+
+  // engagement bar — lifetime reach signals (comparable scale)
+  const labels = [], data = [], colors = [];
+  if (tt.likes) { labels.push("TikTok likes"); data.push(tt.likes); colors.push("#f7931a"); }
+  if (yt.views) { labels.push("YouTube views"); data.push(yt.views); colors.push("#3d8bff"); }
+  if (tt.followers) { labels.push("TikTok followers"); data.push(tt.followers); colors.push("#2bd47a"); }
+  const cv = $("#socialChart");
+  if (cv && data.length && window.Chart) {
+    if (socialChart) socialChart.destroy();
+    socialChart = new Chart(cv, {
+      type: "bar",
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 6, maxBarThickness: 26 }] },
+      options: {
+        indexAxis: "y", responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#0a0d14", borderColor: "#2c2a26", borderWidth: 1, padding: 8,
+            callbacks: { label: c => " " + c.parsed.x.toLocaleString() },
+          },
+        },
+        scales: {
+          x: { grid: { color: "rgba(255,255,255,.05)" }, ticks: { color: "#9d978c", callback: v => compactNum(v) } },
+          y: { grid: { display: false }, ticks: { color: "#e9e4da", font: { weight: 600 } } },
+        },
+      },
+    });
+  }
 }
 
 /* ---------- greeting ---------- */

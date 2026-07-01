@@ -25,7 +25,20 @@
       { "name": "Wen Moon Club", "price": 500, "members": 20 },
       { "name": "HODL Club", "price": 150, "members": 61 }
     ],
-    "packagesSource": "saddingtonracing.com — tiers & current partners (Jun 30, 2026)"
+    "packagesSource": "saddingtonracing.com — tiers & current partners (Jun 30, 2026)",
+    "heroImage": "assets/action-lead.webp",
+    "mockupImage": "assets/car-track.webp",
+    "video": { "id": "bMbeYUltVuI", "title": "On track with TOSHI #81" },
+    "series": [
+      { "name": "SCCA", "img": "assets/logo-scca.png" },
+      { "name": "IMSA", "img": "assets/logo-imsa.png" },
+      { "name": "FARA", "img": "assets/logo-fara.png" },
+      { "name": "iRacing", "img": "assets/logo-iracing.png" },
+      { "name": "CRS", "img": "assets/logo-crs.png" }
+    ],
+    "growthLog": [
+      { "date": "2026-06-30", "followers": 128046 }
+    ]
   },
   "name": "Joseph",
   "tagline": "Lights out and away we go.",

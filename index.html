@@ -4,6 +4,47 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TOSHI #81 — Morning Race Brief · Saddington Racing</title>
+  <!-- ===== SEO + social share (Open Graph / Twitter) ===== -->
+  <meta name="description" content="Sponsor Joseph &quot;TOSHI #81&quot; Saddington — one of America's youngest pro racers. 128K+ fans across TikTok, YouTube & Instagram, real-world Spec Miata + sim racing, Bitcoin Racing USA. Partnership packages from $150." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Saddington Racing" />
+  <meta name="theme-color" content="#f7931a" />
+  <meta name="geo.region" content="US-GA" />
+  <meta name="geo.placename" content="Norcross, Georgia" />
+  <link rel="canonical" href="https://starksaddington.github.io/dashboard/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Saddington Racing" />
+  <meta property="og:title" content="Partner with TOSHI #81 · Saddington Racing" />
+  <meta property="og:description" content="One of America's youngest pro racers — 128K+ fans across TikTok, YouTube & Instagram, real-world Spec Miata + sim racing under Bitcoin Racing USA. See the audience, packages & CTA." />
+  <meta property="og:url" content="https://starksaddington.github.io/dashboard/" />
+  <meta property="og:image" content="https://img.youtube.com/vi/bMbeYUltVuI/maxresdefault.jpg" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="720" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Partner with TOSHI #81 · Saddington Racing" />
+  <meta name="twitter:description" content="One of America's youngest pro racers — 128K+ fans across TikTok, YouTube & Instagram. Bitcoin Racing USA. Packages from $150." />
+  <meta name="twitter:image" content="https://img.youtube.com/vi/bMbeYUltVuI/maxresdefault.jpg" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Joseph Saddington",
+    "alternateName": "TOSHI #81",
+    "jobTitle": "Professional Racing Driver",
+    "description": "One of America's youngest professional racing drivers — Spec Miata (SCCA, IMSA, FARA) and sim racing, competing as TOSHI #81 under Bitcoin Racing USA.",
+    "url": "https://saddingtonracing.com/",
+    "image": "https://img.youtube.com/vi/bMbeYUltVuI/maxresdefault.jpg",
+    "homeLocation": { "@type": "Place", "address": { "@type": "PostalAddress", "addressRegion": "GA", "addressCountry": "US" } },
+    "sameAs": [
+      "https://saddingtonracing.com/",
+      "https://www.youtube.com/@saddingtonracing",
+      "https://www.tiktok.com/@saddingtonracing",
+      "https://www.instagram.com/saddingtonracing",
+      "https://bitcoinracing.us/"
+    ],
+    "sponsor": { "@type": "Organization", "name": "Saddington Racing", "url": "https://saddingtonracing.com/", "email": "starksaddington@gmail.com" }
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -171,6 +212,36 @@
   .pk-src{font-size:.63rem;color:#75706a}
   @media(max-width:880px){.pk-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:480px){.pk-grid{grid-template-columns:1fr}}
+  /* ===== Pitch hero background photo ===== */
+  .pitch{isolation:isolate}
+  .pitch-bg{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center 28%;opacity:.55}
+  .pitch-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(10,10,10,.9),rgba(10,10,10,.68) 52%,rgba(10,10,10,.5))}
+  .pitch-growth{display:flex;align-items:center;gap:7px;font-size:.72rem;color:#9d978c;margin-top:2px}
+  .pitch-growth em{color:#2bd47a;font-style:normal;font-weight:700}
+  .pitch-spark{display:block;width:100%;height:34px;margin-top:2px}
+  /* ===== Showcase: your-brand mockup + highlight video ===== */
+  .showcase{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0 0 26px}
+  .show-card{background:rgba(18,16,13,.5);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+  .show-h{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:#f7931a;font-weight:700;padding:14px 16px 0}
+  .show-sub{font-size:.8rem;color:#9d978c;padding:2px 16px 12px}
+  .mockup{position:relative;flex:1;min-height:210px}
+  .mockup img{width:100%;height:100%;object-fit:cover;display:block}
+  .mockup-pin{position:absolute;transform:translate(-50%,-50%);background:rgba(247,147,26,.94);color:#0a0d14;font-weight:700;font-size:.64rem;padding:4px 9px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.45);animation:pinpulse 2.6s ease-in-out infinite}
+  .mockup-pin::after{content:"";position:absolute;left:14px;bottom:-5px;border:5px solid transparent;border-top-color:rgba(247,147,26,.94)}
+  @keyframes pinpulse{50%{transform:translate(-50%,-50%) scale(1.07)}}
+  .video-wrap{position:relative;flex:1;min-height:210px;background:#000}
+  .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  /* ===== Credibility strip: series logos + tracks ===== */
+  .cred{background:rgba(18,16,13,.5);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px 22px;margin:0 0 26px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 26px}
+  .cred-block{display:flex;flex-direction:column;gap:9px}
+  .cred-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:#75706a;font-weight:700}
+  .cred-logos{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
+  .cred-logos img{height:32px;width:auto;object-fit:contain;filter:grayscale(1) brightness(1.8);opacity:.82;transition:.2s}
+  .cred-logos img:hover{filter:none;opacity:1}
+  .cred-tracks{display:flex;flex-wrap:wrap;gap:7px}
+  .cred-track{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:4px 10px;font-size:.74rem;color:#c9c3b8}
+  .cred-div{width:1px;align-self:stretch;min-height:44px;background:rgba(255,255,255,.09);margin:0 2px}
+  @media(max-width:880px){.showcase{grid-template-columns:1fr}.cred-div{display:none}}
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23f7931a'/%3E%3Ctext x='50' y='73' font-size='62' font-weight='bold' text-anchor='middle' fill='%23000' font-family='Arial'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
 </head>
@@ -199,6 +270,12 @@
 
   <!-- SPONSOR CTA — partner-facing pitch (top of page) -->
   <section class="pitch" id="sponsorPitch"></section>
+
+  <!-- SHOWCASE: your brand on the car + highlight video -->
+  <section class="showcase" id="sponsorShowcase"></section>
+
+  <!-- CREDIBILITY: sanctioning bodies + tracks raced -->
+  <section class="cred" id="sponsorCred"></section>
 
   <!-- PARTNERSHIP PACKAGES (under the pitch) -->
   <section class="packs" id="sponsorPacks"></section>

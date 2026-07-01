@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://starksaddington.github.io/dashboard/sitemap.xml

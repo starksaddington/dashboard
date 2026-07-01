@@ -57,6 +57,8 @@ function renderAll() {
   let events = [];
   try { events = buildEvents(); } catch (e) { console.error("buildEvents failed —", e); }
   safeRender("sponsorPitch", renderSocial);
+  safeRender("sponsorShowcase", renderShowcase);
+  safeRender("sponsorCred", renderCred);
   safeRender("sponsorPacks", renderPackages);
   safeRender("greeting", renderGreeting);
   safeRender("bizStrip", renderBizStrip);
@@ -124,8 +126,11 @@ function renderSocial() {
       <b>${esc(p.label)}</b><span>${head}</span></a>`;
   }).join("");
 
+  const growth = renderGrowth(s);
+
   box.innerHTML =
-    `<div class="pitch-glow"></div>
+    `${s.heroImage ? `<div class="pitch-bg" style="background-image:url('${esc(s.heroImage)}')"></div>` : ""}
+     <div class="pitch-glow"></div>
      <div class="pitch-main">
        <div class="pitch-eyebrow">🤝 Sponsorship · ${esc(team.name || "Saddington Racing")} · Bitcoin Racing USA</div>
        <h2 class="pitch-h">${esc(s.tagline || "Partner with TOSHI #81.")}</h2>
@@ -142,11 +147,12 @@ function renderSocial() {
          ${tiles.map((t, i) => `<div class="pitch-tile${i === 0 ? " big" : ""}"><b>${t.v}</b><label>${esc(t.l)}</label></div>`).join("")}
        </div>
        <div class="pitch-chart"><canvas id="socialChart"></canvas></div>
+       ${growth}
        <div class="pitch-prov">Audience verified ${esc(s.asOf || "")}${s.verified ? " · " + esc(s.verified) : ""}</div>
      </div>`;
 
-  // (no popCounts here: tiles show compact "128K+/1.4M" strings the digit-only
-  //  count-up animator would corrupt.)
+  // animated count-up that preserves the "K/M/+" suffix on the stat tiles
+  animateCompactTiles(box);
 
   // engagement bar — lifetime reach signals (comparable scale)
   const labels = [], data = [], colors = [];
@@ -175,6 +181,98 @@ function renderSocial() {
       },
     });
   }
+}
+
+/* count-up that keeps the "K/M/+" suffix (the plain popCounts would mangle it) */
+function animateCompactTiles(scope) {
+  scope.querySelectorAll(".pitch-tile b").forEach(el => {
+    const m = (el.textContent || "").trim().match(/^([\d.]+)([KM]?)(\+?)$/);
+    if (!m) return;                       // e.g. "Daily" — leave as-is
+    const target = parseFloat(m[1]) * (m[2] === "M" ? 1e6 : m[2] === "K" ? 1e3 : 1);
+    const suffix = m[3], dur = 900, t0 = performance.now();
+    (function step(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      const v = target * (1 - Math.pow(1 - p, 3));
+      el.textContent = compactNum(Math.round(v)) + (p >= 1 ? suffix : "");
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  });
+}
+
+/* audience-growth line: sparkline once >=2 weekly points exist, else a note.
+   Points come from config.social.growthLog [{date, followers}] — never faked. */
+function renderGrowth(s) {
+  const gl = (s.growthLog || []).filter(p => p && isFinite(p.followers));
+  if (gl.length >= 2) {
+    const vals = gl.map(p => p.followers);
+    const mn = Math.min(...vals), mx = Math.max(...vals), span = (mx - mn) || 1;
+    const W = 240, H = 34;
+    const pts = gl.map((p, i) => [
+      (i / (gl.length - 1)) * W,
+      (H - 3) - ((p.followers - mn) / span) * (H - 8),
+    ]);
+    const poly = pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+    const delta = vals[vals.length - 1] - vals[0];
+    return `<div class="pitch-growth">📈 Audience growth <em>${delta >= 0 ? "+" : ""}${compactNum(delta)}</em> since ${esc((gl[0].date || "").slice(5))}</div>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="pitch-spark">
+        <polyline points="${poly}" fill="none" stroke="#2bd47a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${pts[pts.length - 1][0].toFixed(1)}" cy="${pts[pts.length - 1][1].toFixed(1)}" r="3" fill="#2bd47a"/>
+      </svg>`;
+  }
+  return `<div class="pitch-growth">📈 <span>Audience growth tracked weekly — trend line building.</span></div>`;
+}
+
+/* ---------- Showcase: "your brand on the car" mockup + highlight video ---------- */
+function renderShowcase() {
+  const box = $("#sponsorShowcase");
+  if (!box) return;
+  const s = (BUNDLE.config || {}).social || {};
+  const vid = s.video || {}, mock = s.mockupImage;
+  if (!vid.id && !mock) { box.style.display = "none"; return; }
+  const mockCard = mock ? `
+    <div class="show-card">
+      <div class="show-h">🏁 Your brand on the car</div>
+      <div class="show-sub">Hood, doors & rear quarter — plus suit and helmet.</div>
+      <div class="mockup">
+        <img src="${esc(mock)}" alt="TOSHI #81 Spec Miata — sponsor branding placement" loading="lazy">
+        <span class="mockup-pin" style="left:50%;top:44%">Your logo here</span>
+        <span class="mockup-pin" style="left:27%;top:63%">Your logo here</span>
+        <span class="mockup-pin" style="left:73%;top:61%">Your logo here</span>
+      </div>
+    </div>` : "";
+  const vidCard = vid.id ? `
+    <div class="show-card">
+      <div class="show-h">🎥 See it in action</div>
+      <div class="show-sub">${esc(vid.title || "Race highlights")}</div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube-nocookie.com/embed/${esc(vid.id)}" title="${esc(vid.title || "Highlight video")}" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>` : "";
+  box.innerHTML = mockCard + vidCard;
+}
+
+/* ---------- Credibility strip: sanctioning bodies + tracks raced ---------- */
+function renderCred() {
+  const box = $("#sponsorCred");
+  if (!box) return;
+  const s = (BUNDLE.config || {}).social || {};
+  const series = s.series || [];
+  const races = (BUNDLE.config || {}).races || [];
+  const tracks = [...new Set(races
+    .map(r => (r.track || "").replace(/\s+(International Raceway|International Speedway|Speedway|Motor Club)$/i, "").trim())
+    .filter(Boolean))];
+  const logoHtml = series.length ? `
+    <div class="cred-block">
+      <span class="cred-lbl">Sanctioned & racing in</span>
+      <div class="cred-logos">${series.map(x => `<img src="${esc(x.img)}" alt="${esc(x.name)}" title="${esc(x.name)}" loading="lazy">`).join("")}</div>
+    </div>` : "";
+  const trackHtml = tracks.length ? `
+    <div class="cred-block">
+      <span class="cred-lbl">Raced at</span>
+      <div class="cred-tracks">${tracks.slice(0, 8).map(t => `<span class="cred-track">${esc(t)}</span>`).join("")}</div>
+    </div>` : "";
+  if (!logoHtml && !trackHtml) { box.style.display = "none"; return; }
+  box.innerHTML = logoHtml + ((logoHtml && trackHtml) ? `<div class="cred-div"></div>` : "") + trackHtml;
 }
 
 /* ---------- Partnership packages (under the pitch) ----------

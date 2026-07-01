@@ -317,3 +317,50 @@ h1,h2,h3,.clock span,.cd-box span,.kicker{font-family:'Bai Jamjuree','Rajdhani',
   .grid{grid-template-columns:1fr}
   .clock span{font-size:21px}
 }
+
+/* ===== Mobile polish (audit 2026-06-30): tap targets >=44px, topbar fit,
+   full-width CTAs, fluid headings, no horizontal overflow ===== */
+@media(max-width:600px){
+  body{padding:0 12px 48px}
+  /* topbar fits on one row; long tagline truncates instead of overflowing */
+  .topbar{padding:14px 2px 10px;gap:10px}
+  .brand{gap:9px;min-width:0}
+  .brand-mark{font-size:22px}
+  .brand-text{min-width:0}
+  .brand-text strong{font-size:16px;letter-spacing:1px}
+  .brand-text small{font-size:9px;letter-spacing:1.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+  .topbar-right{gap:10px}
+  .clock span{font-size:17px}
+  .clock small{font-size:9px;letter-spacing:.5px}
+  .refresh{padding:12px 14px;min-height:44px}
+  /* headings scale down */
+  .section-title{font-size:19px;margin:26px 2px 13px}
+  .hero-next-name{font-size:21px}
+  /* interactive elements -> >=44px touch targets */
+  .seg{padding:5px}
+  .seg button{padding:9px 14px;font-size:13px;min-height:44px}
+  .lnk{padding:13px 16px;min-height:46px}
+  .hq-links a,.task-links a{display:inline-flex;align-items:center;min-height:40px}
+  .pitch-plat{min-height:46px;justify-content:center}
+  .daily-reset{min-height:42px}
+  .daily-streak{font-size:13px;padding:8px 13px}
+  /* primary CTAs go full-width for easy thumb tap */
+  .pitch-actions{flex-direction:column;align-items:stretch;gap:10px}
+  .pitch-cta{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center}
+  .pitch-cta2{text-align:center;padding:10px 4px}
+  .pk-cta-row{flex-direction:column;align-items:stretch;gap:10px}
+  .pk-src{text-align:center}
+  /* sponsor sections: trim side padding on small screens */
+  .pitch{padding:22px 16px;gap:22px}
+  .packs{padding:20px 16px}
+  .pk-h{font-size:1.3rem}
+  /* charts a touch shorter to reduce scroll */
+  .chart-wrap{height:260px}
+  .chart-wrap.small{height:210px}
+}
+@media(max-width:380px){
+  .brand-text small{max-width:42vw}
+  .hero-countdown{gap:7px}
+  .cd-box span{font-size:23px}
+  .pitch-tiles{grid-template-columns:repeat(2,1fr)}
+}

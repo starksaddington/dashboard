@@ -25,6 +25,7 @@
       { "name": "Wen Moon Club", "price": 500, "members": 20 },
       { "name": "HODL Club", "price": 150, "members": 61 }
     ],
+    "packagesUrl": "https://saddingtonracing.com/support",
     "packagesSource": "saddingtonracing.com — tiers & current partners (Jun 30, 2026)",
     "heroImage": "assets/action-lead.webp",
     "mockupImage": "assets/car-track.webp",

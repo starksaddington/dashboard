@@ -287,6 +287,7 @@ function renderPackages() {
   const email = s.contactEmail || "starksaddington@gmail.com";
   const mailto = `mailto:${email}?subject=${encodeURIComponent("Sponsoring TOSHI #81 — Saddington Racing")}`;
   const fmt = n => "$" + Number(n || 0).toLocaleString();
+  const pkUrl = s.packagesUrl || ((BUNDLE.config || {}).team || {}).site || "https://saddingtonracing.com/";
 
   const cards = pk.map((p, i) => {
     let proofLbl = "", proof = "";
@@ -297,11 +298,12 @@ function renderPackages() {
       proofLbl = `<div class="pk-proof-lbl">Members</div>`;
       proof = `<div class="pk-proof"><span>${p.members} & counting</span></div>`;
     }
-    return `<div class="pk-card${i === 0 ? " top" : ""}">
+    return `<a class="pk-card${i === 0 ? " top" : ""}" href="${esc(pkUrl)}" target="_blank" rel="noopener">
       <div class="pk-name">${esc(p.name)}</div>
       <div class="pk-price">${fmt(p.price)}</div>
       ${proofLbl}${proof}
-    </div>`;
+      <span class="pk-go">View details →</span>
+    </a>`;
   }).join("");
 
   const benefits = (s.benefits || []).map(b => `<span class="pk-benefit">✓ ${esc(b)}</span>`).join("");

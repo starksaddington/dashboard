@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-01T15:15:18",
+  "generatedAt": "2026-07-01T15:45:19",
   "totals": {
     "prospects": 2534,
     "emailable": 1397,
     "drafted": 0,
-    "sent": 974,
-    "remaining": 368,
+    "sent": 977,
+    "remaining": 365,
     "forms": 917,
     "social": 220
   },
@@ -99,7 +99,7 @@
     },
     {
       "date": "2026-07-01",
-      "total": 974
+      "total": 977
     }
   ],
   "health": {

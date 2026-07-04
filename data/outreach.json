@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-04T16:45:20",
+  "generatedAt": "2026-07-04T17:15:20",
   "totals": {
     "prospects": 2534,
     "emailable": 1397,
     "drafted": 0,
-    "sent": 1198,
-    "remaining": 138,
+    "sent": 1201,
+    "remaining": 134,
     "forms": 917,
     "social": 220
   },
@@ -111,11 +111,11 @@
     },
     {
       "date": "2026-07-04",
-      "total": 1198
+      "total": 1201
     }
   ],
   "health": {
-    "bounced": 40,
+    "bounced": 41,
     "declined": 14,
     "dailyCap": 75
   }

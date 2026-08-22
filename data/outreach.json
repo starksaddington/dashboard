@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-08-22T08:06:56",
+  "generatedAt": "2026-08-22T08:23:09",
   "totals": {
     "prospects": 2534,
     "emailable": 1397,
     "drafted": 0,
-    "sent": 1249,
+    "sent": 1243,
     "remaining": 77,
     "forms": 917,
     "social": 220
@@ -123,12 +123,12 @@
     },
     {
       "date": "2026-08-22",
-      "total": 1249
+      "total": 1243
     }
   ],
   "health": {
     "bounced": 45,
-    "declined": 18,
+    "declined": 23,
     "dailyCap": 75
   }
 }
